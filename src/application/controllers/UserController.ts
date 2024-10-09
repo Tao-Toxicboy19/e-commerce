@@ -1,24 +1,29 @@
 import { z } from 'zod'
-import { Login } from '../../domain/usecase/login'
-import { Profile } from '../../domain/usecase/profile'
-import { Signup } from '../../domain/usecase/signup'
-import { Update } from '../../domain/usecase/update'
+import { LoginUsecase } from '../../domain/usecase/user/login'
+import { ProfileUsecase } from '../../domain/usecase/user/profile'
+import { SignupUsecase } from '../../domain/usecase/user/signup'
+import { UpdateUsecase } from '../../domain/usecase/user/update'
 import { Request, Response } from 'express'
 import { User } from '../../domain/entities/User'
 import { HttpError } from '../../infrastructure/errors/HttpError'
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
+import { Session } from 'express-session'
 
 type Tokens = {
     accessToken: string
     refreshToken: string
 }
 
+interface ExtSession extends Session {
+    access_token?: string
+}
+
 export class UserController {
     constructor(
-        private login: Login,
-        private signup: Signup,
-        private profile: Profile,
-        private update: Update
+        private loginUsecase: LoginUsecase,
+        private signupUsecase: SignupUsecase,
+        private profileUsecase: ProfileUsecase,
+        private updateUsecase: UpdateUsecase,
     ) {}
 
     // สร้าง Zod schema สำหรับการ login
@@ -33,11 +38,11 @@ export class UserController {
         password: z.string().min(6),
     })
 
-    async loginHandler(req: Request, res: Response) {
+    async loginHandler(req: Request & { session: ExtSession }, res: Response) {
         try {
             // Validate ข้อมูลที่รับจาก request body
             const { email, password } = this.loginSchema.parse(req.body)
-            const payload = await this.login.execute(email, password)
+            const payload = await this.loginUsecase.execute(email, password)
             // บันทึก email ลงใน session ที่เชื่อมต่อกับ Redis
             const { accessToken, refreshToken } = this.getTokens(
                 payload.sub,
@@ -45,11 +50,38 @@ export class UserController {
             )
 
             req.session.access_token = accessToken
-            req.session.refresh_token = refreshToken
+            // เก็บ Refresh Token ใน cookie แยก (หมดอายุใน 5 วัน)
+            res.cookie('refresh_token', refreshToken, {
+                httpOnly: true,
+                maxAge: 1000 * 60 * 60 * 24 * 5, // 5 วัน
+                secure: false, // ใช้ true สำหรับ HTTPS
+            })
 
             res.send('Login Successful')
         } catch (err) {
-            console.log(err)
+            if (err instanceof HttpError) {
+                res.status(err.statusCode).send({
+                    message: err.message,
+                    statusCode: err.statusCode,
+                })
+            } else {
+                res.status(500).send({
+                    message: err,
+                    statusCode: 500,
+                })
+            }
+        }
+    }
+
+    async profileHandler(req: Request, res: Response) {
+        try {
+            const payload = req.user as JwtPayload
+            if (!payload || !payload.sub) {
+                res.send('kko')
+            }
+            const user = await this.profileUsecase.execute(payload.sub!)
+            res.json(user).status(200)
+        } catch (err) {
             if (err instanceof HttpError) {
                 res.status(err.statusCode).send({
                     message: err.message,
@@ -72,9 +104,8 @@ export class UserController {
                 email,
                 password,
                 role: 'customer',
-                address: null,
             })
-            await this.signup.execute(user)
+            await this.signupUsecase.execute(user)
 
             res.send('signup ok')
         } catch (err) {
@@ -117,17 +148,3 @@ export class UserController {
         }
     }
 }
-
-// res.cookie('access_token', accessToken, {
-//     httpOnly: true,
-//     maxAge: 1 * 24 * 60 * 60 * 1000, // 1d
-//     sameSite: 'strict',
-//     secure: process.env.NODE_ENV === 'production',
-// })
-
-// res.cookie('refresh_token', refreshToken, {
-//     httpOnly: true,
-//     maxAge: 5 * 24 * 60 * 60 * 1000, // 1d
-//     sameSite: 'strict',
-//     secure: process.env.NODE_ENV === 'production',
-// })

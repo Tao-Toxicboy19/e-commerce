@@ -1,27 +1,30 @@
 import { Router } from 'express'
 import { UserRepository } from '../../infrastructure/repository/UserRepository'
-import { Login } from '../../domain/usecase/login'
 import { UserController } from '../controllers/UserController'
-import { Signup } from '../../domain/usecase/signup'
-import { Profile } from '../../domain/usecase/profile'
-import { Update } from '../../domain/usecase/update'
+import { LoginUsecase } from '../../domain/usecase/user/login'
+import { SignupUsecase } from '../../domain/usecase/user/signup'
+import { ProfileUsecase } from '../../domain/usecase/user/profile'
+import { UpdateUsecase } from '../../domain/usecase/user/update'
 import { JwtAuthGuard } from '../middleware/JwtAuthGuard'
 
 const router = Router()
 
 const userRepository = new UserRepository()
-const loginUsecase = new Login(userRepository)
-const signupUsecase = new Signup(userRepository)
-const profileUsecase = new Profile(userRepository)
-const updateUsecase = new Update(userRepository)
+const loginUsecase = new LoginUsecase(userRepository)
+const signupUsecase = new SignupUsecase(userRepository)
+const profileUsecase = new ProfileUsecase(userRepository)
+const updateUsecase = new UpdateUsecase(userRepository)
 const userController = new UserController(
     loginUsecase,
     signupUsecase,
     profileUsecase,
-    updateUsecase
+    updateUsecase,
 )
 
 router.post('/login', (req, res) => userController.loginHandler(req, res))
 router.post('/signup', (req, res) => userController.signupHandler(req, res))
+router.get('/profile', JwtAuthGuard, (req, res) =>
+    userController.profileHandler(req, res)
+)
 
 export default router

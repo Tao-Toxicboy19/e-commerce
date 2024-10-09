@@ -1,10 +1,11 @@
 import express from 'express'
-import userRoutes from './application/routes/UserRoute'
 import connectDB from './infrastructure/database/mongodb'
 import * as dotenv from 'dotenv'
 import Redis from 'ioredis'
 import session from 'express-session'
 import RedisStore from 'connect-redis'
+import userRoutes from './application/routes/UserRoute'
+import addressRoute from './application/routes/AddressRoute'
 
 dotenv.config()
 
@@ -29,11 +30,13 @@ app.use(
             httpOnly: true,
             sameSite: 'strict',
             secure: process.env.NODE_ENV === 'production', // secure: true สำหรับ production ที่ใช้ https
+            maxAge: 1000 * 60 * 15, // 15 นาที
         },
     })
 )
 app.use(express.json())
 app.use('/api', userRoutes)
+app.use('/api', addressRoute)
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

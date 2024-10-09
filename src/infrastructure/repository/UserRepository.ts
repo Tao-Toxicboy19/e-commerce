@@ -25,13 +25,15 @@ export class UserRepository implements IUserRepository {
     }
 
     async profile(sub: string): Promise<User> {
-        const user = await UserModel.findById({ _id: sub }).exec() // `.exec()` เพื่อให้ query มีประสิทธิภาพ
+        const user = await UserModel.findById({ _id: sub })
+            .select('_id name email role address')
+            .exec() // `.exec()` เพื่อให้ query มีประสิทธิภาพ
         if (!user) throw new Error('User not found.')
 
         return user
     }
 
-    async signup(dto: User): Promise<string> {
+    async signup(dto: User): Promise<void> {
         const existingUser = await UserModel.findOne({
             $or: [{ name: dto.name }, { email: dto.email }],
         }).exec()
@@ -47,11 +49,9 @@ export class UserRepository implements IUserRepository {
             role: dto.role,
         })
         await newUser.save()
-
-        return 'OK'
     }
 
-    async update(dto: User): Promise<string> {
+    async update(dto: User): Promise<void> {
         const updateUser = await UserModel.findByIdAndUpdate(
             { email: dto.email },
             {
@@ -63,7 +63,5 @@ export class UserRepository implements IUserRepository {
         ).exec()
 
         if (!updateUser) throw new Error('User not found or update failed.')
-
-        return 'OK'
     }
 }

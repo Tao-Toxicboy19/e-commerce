@@ -1,6 +1,6 @@
-import { IUserRepository } from '../interfaces/IUserRepository'
+import { IUserRepository } from '../../interfaces/IUserRepository'
 
-export class Login {
+export class LoginUsecase {
     constructor(private userRepository: IUserRepository) {}
 
     async execute(
