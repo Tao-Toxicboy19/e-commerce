@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { JwtAuthGuard } from '../middleware/JwtAuthGuard'
 import { AddressRepository } from '../../infrastructure/repository/AddressRepository'
-import { AddressUsecase } from '../../domain/usecase/address/address'
 import { AddressController } from '../controllers/AddressController'
+import { AddressUsecase } from '../../domain/usecase/address/AddressUsecase'
 
 const router = Router()
 

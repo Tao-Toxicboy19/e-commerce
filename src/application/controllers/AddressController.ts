@@ -1,8 +1,9 @@
 import { z } from 'zod'
-import { AddressUsecase } from '../../domain/usecase/address/address'
 import { JwtPayload } from 'jsonwebtoken'
 import { Request, Response } from 'express'
 import { HttpError } from '../../infrastructure/errors/HttpError'
+import { Address } from '../../domain/entities/Address'
+import { AddressUsecase } from '../../domain/usecase/address/AddressUsecase'
 
 export class AddressController {
     constructor(private addressUsecase: AddressUsecase) {}
@@ -23,15 +24,16 @@ export class AddressController {
 
             const payload = req.user as JwtPayload
             if (!payload || !payload.sub) res.status(401).send('Unauthorized')
-
-            // ส่งข้อมูลไปยัง usecase โดยแปลงจาก postal_code เป็น postalCode
-            await this.addressUsecase.execute(payload.sub!, {
+            const address = new Address({
                 street,
                 city,
                 state,
-                postalCode: postal_code, // แปลงเป็น postalCode
+                postalCode: postal_code,
                 country,
             })
+
+            // ส่งข้อมูลไปยัง usecase โดยแปลงจาก postal_code เป็น postalCode
+            await this.addressUsecase.execute(payload.sub!, address)
 
             res.status(200).send('Address updated successfully')
         } catch (err) {

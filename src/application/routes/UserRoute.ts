@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import { UserRepository } from '../../infrastructure/repository/UserRepository'
 import { UserController } from '../controllers/UserController'
-import { LoginUsecase } from '../../domain/usecase/user/login'
-import { SignupUsecase } from '../../domain/usecase/user/signup'
-import { ProfileUsecase } from '../../domain/usecase/user/profile'
-import { UpdateUsecase } from '../../domain/usecase/user/update'
+import { LoginUsecase } from '../../domain/usecase/user/LoginUsecase'
+import { SignupUsecase } from '../../domain/usecase/user/SignupUsecase'
+import { ProfileUsecase } from '../../domain/usecase/user/ProfileUsecase'
+import { UpdateUsecase } from '../../domain/usecase/user/UpdateUsecase'
 import { JwtAuthGuard } from '../middleware/JwtAuthGuard'
 
 const router = Router()
@@ -18,7 +18,7 @@ const userController = new UserController(
     loginUsecase,
     signupUsecase,
     profileUsecase,
-    updateUsecase,
+    updateUsecase
 )
 
 router.post('/login', (req, res) => userController.loginHandler(req, res))

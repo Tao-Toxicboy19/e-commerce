@@ -1,4 +1,5 @@
 import { Schema, model, Document } from 'mongoose'
+import { Role } from '../../domain/entities/User'
 
 // Type definition for Address
 type Address = {
@@ -15,11 +16,11 @@ export interface IUser extends Document {
     email: string
     password: string
     address: Address | null
-    role: 'customer' | 'admin'
+    role: Role
 }
 
 // Define Address Schema
-const AddressSchema = new Schema<Address>({
+const AddressSchema: Schema<Address> = new Schema<Address>({
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
@@ -34,7 +35,11 @@ export const UserSchema = new Schema<IUser>(
         email: { type: String, required: true },
         password: { type: String, required: true },
         address: { type: AddressSchema, required: false }, // Allow null address
-        role: { type: String, enum: ['customer', 'admin'], required: true },
+        role: {
+            type: String,
+            enum: ['customer', 'admin', 'shop'],
+            required: true,
+        },
     },
     { timestamps: true }
 )

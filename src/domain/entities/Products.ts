@@ -1,29 +1,40 @@
-type Review = {
-    userId: string
-    rating: number
-    comment: string
+import { Types } from 'mongoose'
+
+export type ProductQuery = {
+    query?: string
+    category?: string
+    range?: { start: number; end: number }
 }
 
 export class Products {
-    name: string
-    description: string
-    price: number
-    category: string
-    brand: string
-    stock: number
-    images: string[]
-    reviews: Review[]
+    public name: string
+    public description: string
+    public price: number
+    public category: string
+    public brand: string
+    public stock: number
+    public images: string[]
+    public shopId: Types.ObjectId
 
-    constructor(
-        name: string,
-        description: string,
-        price: number,
-        category: string,
-        brand: string,
-        stock: number,
-        images: string[],
-        reviews: Review[]
-    ) {
+    constructor({
+        name,
+        description,
+        price,
+        category,
+        brand,
+        stock,
+        images,
+        shopId,
+    }: {
+        name: string
+        description: string
+        price: number
+        category: string
+        brand: string
+        stock: number
+        images: string[]
+        shopId: Types.ObjectId
+    }) {
         this.name = name
         this.description = description
         this.price = price
@@ -31,6 +42,6 @@ export class Products {
         this.brand = brand
         this.stock = stock
         this.images = images
-        this.reviews = reviews
+        this.shopId = shopId
     }
 }

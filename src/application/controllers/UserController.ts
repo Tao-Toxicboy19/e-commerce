@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { LoginUsecase } from '../../domain/usecase/user/login'
-import { ProfileUsecase } from '../../domain/usecase/user/profile'
-import { SignupUsecase } from '../../domain/usecase/user/signup'
-import { UpdateUsecase } from '../../domain/usecase/user/update'
+import { LoginUsecase } from '../../domain/usecase/user/LoginUsecase'
+import { ProfileUsecase } from '../../domain/usecase/user/ProfileUsecase'
+import { SignupUsecase } from '../../domain/usecase/user/SignupUsecase'
+import { UpdateUsecase } from '../../domain/usecase/user/UpdateUsecase'
 import { Request, Response } from 'express'
 import { User } from '../../domain/entities/User'
 import { HttpError } from '../../infrastructure/errors/HttpError'
@@ -23,7 +23,7 @@ export class UserController {
         private loginUsecase: LoginUsecase,
         private signupUsecase: SignupUsecase,
         private profileUsecase: ProfileUsecase,
-        private updateUsecase: UpdateUsecase,
+        private updateUsecase: UpdateUsecase
     ) {}
 
     // สร้าง Zod schema สำหรับการ login

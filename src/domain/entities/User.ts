@@ -1,8 +1,10 @@
+export type Role = 'customer' | 'admin' | 'shop'
+
 export class User {
     public name: string
     public email: string
     public password: string
-    public role: 'customer' | 'admin'
+    public role: Role
 
     constructor({
         name,
@@ -13,7 +15,7 @@ export class User {
         name: string
         email: string
         password: string
-        role: 'customer' | 'admin'
+        role: Role
     }) {
         this.name = name
         this.email = email
