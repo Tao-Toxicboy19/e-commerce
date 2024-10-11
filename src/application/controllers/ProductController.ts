@@ -2,9 +2,12 @@ import { Request, Response } from 'express'
 import { ProductsUsecase } from '../../domain/usecase/product/ProductsUsecase'
 import { SaveProductUsecase } from '../../domain/usecase/product/SaveProductUsecase'
 import { HttpError } from '../../infrastructure/errors/HttpError'
-import { z } from 'zod'
 import { Products } from '../../domain/entities/Products'
-import { Types } from 'mongoose'
+import { Shop } from '../../domain/entities/Shop'
+import { productSchema } from '../validate/ProductSchema'
+import { querySchema } from '../validate/QuerySchema'
+import { ZodError } from 'zod'
+import { JwtPayload } from '../../types/JwtPayload'
 
 export class ProductController {
     constructor(
@@ -12,41 +15,21 @@ export class ProductController {
         private saveProductUsecase: SaveProductUsecase // private updateProductUsecase: UpdateProductUsecase, // private deleteProductUsecase: DeleteProductUsecase
     ) {}
 
-    private productSchema = z.object({
-        name: z.string(),
-        description: z.string(),
-        price: z.number(),
-        category: z.string(),
-        brand: z.string(),
-        stock: z.number(),
-        images: z.string().array(),
-    })
-
-    // ?query=laptop&category=electronics&start=500&end=1500
-    // สร้าง schema สำหรับการ validate query parameters
-    private querySchema = z.object({
-        query: z.string().optional(),
-        category: z.string().optional(),
-        start: z
-            .string()
-            .optional()
-            .transform((val) => (val ? Number(val) : 0)), // start ต้องเป็น string ที่สามารถแปลงเป็น number หรือค่าเริ่มต้น 0
-        end: z
-            .string()
-            .optional()
-            .transform((val) => (val ? Number(val) : Infinity)), // end ต้องเป็น string ที่สามารถแปลงเป็น number หรือค่าเริ่มต้น Infinity
-    })
-
     async productHandler(req: Request, res: Response) {
         try {
-            const query = this.querySchema.parse(req.query)
+            const query = querySchema.parse(req.query)
             const products = await this.prodcutsUsecase.execute({
                 ...query,
                 range: { start: query.start, end: query.end },
             })
             res.json(products)
         } catch (err) {
-            if (err instanceof HttpError) {
+            if (err instanceof ZodError) {
+                res.status(400).send({
+                    message: err.errors,
+                    statusCode: 400,
+                })
+            } else if (err instanceof HttpError) {
                 res.status(err.statusCode).send({
                     message: err.message,
                     statusCode: err.statusCode,
@@ -62,15 +45,32 @@ export class ProductController {
 
     async saveProductHandler(req: Request, res: Response) {
         try {
-            const body = this.productSchema.parse(req.body)
+            const body = productSchema.parse(req.body)
+
+            const payload = req.user as JwtPayload
+            if (!payload || !payload.sub) res.status(401).send('Unauthorized')
+
+            const shop = new Shop({
+                owner: payload.sub as string,
+                address: {
+                    ...body.shop.address,
+                    postalCode: body.shop.address.postal_code,
+                },
+                name: body.shop.name,
+            })
             const product = new Products({
                 ...body,
-                shopId: new Types.ObjectId(),
+                shop,
             })
-            await this.saveProductUsecase.execute(product)
+            // await this.saveProductUsecase.execute(product)
             res.json({ message: 'OK' })
         } catch (err) {
-            if (err instanceof HttpError) {
+            if (err instanceof ZodError) {
+                res.status(400).send({
+                    message: err.errors,
+                    statusCode: 400,
+                })
+            } else if (err instanceof HttpError) {
                 res.status(err.statusCode).send({
                     message: err.message,
                     statusCode: err.statusCode,

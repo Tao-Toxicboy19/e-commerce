@@ -1,4 +1,4 @@
-import { User } from '../../domain/entities/User'
+import { User, UserJwt } from '../../domain/entities/User'
 import { IUserRepository } from '../../domain/interfaces/IUserRepository'
 import bcrypt from 'bcrypt'
 import { UserModel } from '../schemas/UserSchema'
@@ -6,18 +6,16 @@ import { ObjectId } from 'mongoose'
 import { HttpError } from '../errors/HttpError'
 
 export class UserRepository implements IUserRepository {
-    async login(
-        email: string,
-        password: string
-    ): Promise<{ sub: string; email: string }> {
+    async login(email: string, password: string): Promise<UserJwt> {
         const user = await UserModel.findOne({ email })
-            .select('password email _id')
+            .select('password email _id role')
             .exec() // จำกัด fields เพื่อเพิ่มความเร็ว
 
         if (user && (await bcrypt.compare(password, user.password))) {
             return {
                 sub: (user._id as ObjectId).toString(),
                 email: user.email,
+                role: user.role,
             }
         }
 
@@ -26,9 +24,9 @@ export class UserRepository implements IUserRepository {
 
     async profile(sub: string): Promise<User> {
         const user = await UserModel.findById({ _id: sub })
-            .select('_id name email role address')
+            .select('_id name email role address shop')
             .exec() // `.exec()` เพื่อให้ query มีประสิทธิภาพ
-        if (!user) throw new Error('User not found.')
+        if (!user) throw new HttpError('User not found.', 404)
 
         return user
     }
@@ -62,6 +60,7 @@ export class UserRepository implements IUserRepository {
             { new: true, runValidators: true }
         ).exec()
 
-        if (!updateUser) throw new Error('User not found or update failed.')
+        if (!updateUser)
+            throw new HttpError('User not found or update failed.', 404)
     }
 }

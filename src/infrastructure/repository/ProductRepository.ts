@@ -47,6 +47,7 @@ export class ProductRepository implements IProductsRepository {
                 brand: dto.brand,
                 stock: dto.stock,
                 images: dto.images,
+                shop: dto.shop,
             })
 
             await newProduct.save()

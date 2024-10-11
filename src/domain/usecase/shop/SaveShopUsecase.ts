@@ -1,10 +1,10 @@
 import { Shop } from '../../entities/Shop'
 import { IShopRepository } from '../../interfaces/IShopRepository'
 
-export class SaveProductUsecase {
+export class SaveShopUsecase {
     constructor(private shopRepository: IShopRepository) {}
 
-    async execute(dto: Shop): Promise<void> {
-        return this.shopRepository.saveShop(dto)
+    async execute(id: string, dto: Shop): Promise<void> {
+        return this.shopRepository.saveShop(id, dto)
     }
 }

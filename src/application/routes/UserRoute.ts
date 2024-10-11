@@ -5,7 +5,7 @@ import { LoginUsecase } from '../../domain/usecase/user/LoginUsecase'
 import { SignupUsecase } from '../../domain/usecase/user/SignupUsecase'
 import { ProfileUsecase } from '../../domain/usecase/user/ProfileUsecase'
 import { UpdateUsecase } from '../../domain/usecase/user/UpdateUsecase'
-import { JwtAuthGuard } from '../middleware/JwtAuthGuard'
+import { UseGuard } from '../middleware/UseGuard'
 
 const router = Router()
 
@@ -23,7 +23,7 @@ const userController = new UserController(
 
 router.post('/login', (req, res) => userController.loginHandler(req, res))
 router.post('/signup', (req, res) => userController.signupHandler(req, res))
-router.get('/profile', JwtAuthGuard, (req, res) =>
+router.get('/profile', UseGuard.jwtAuthGuard, (req, res) =>
     userController.profileHandler(req, res)
 )
 

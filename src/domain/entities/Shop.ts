@@ -1,8 +1,7 @@
-import { Types } from 'mongoose'
 import { Address } from './Address'
 
 export class Shop {
-    public owner: Types.ObjectId
+    public owner: string
     public name: string
     public address: Address
 
@@ -11,7 +10,7 @@ export class Shop {
         name,
         address,
     }: {
-        owner: Types.ObjectId
+        owner: string
         name: string
         address: Address
     }) {

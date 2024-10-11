@@ -3,6 +3,7 @@ import { ProductRepository } from '../../infrastructure/repository/ProductReposi
 import { ProductsUsecase } from '../../domain/usecase/product/ProductsUsecase'
 import { ProductController } from '../controllers/ProductController'
 import { SaveProductUsecase } from '../../domain/usecase/product/SaveProductUsecase'
+import { UseGuard } from '../middleware/UseGuard'
 
 const router = Router()
 
@@ -17,8 +18,11 @@ const productsController = new ProductController(
 router.get('/products', (req, res) =>
     productsController.productHandler(req, res)
 )
-router.post('/product', (req, res) =>
-    productsController.saveProductHandler(req, res)
+router.post(
+    '/product',
+    UseGuard.jwtAuthGuard,
+    UseGuard.shopRoleGuard,
+    (req, res) => productsController.saveProductHandler(req, res)
 )
 
 export default router

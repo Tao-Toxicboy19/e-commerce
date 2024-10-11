@@ -7,6 +7,7 @@ import RedisStore from 'connect-redis'
 import userRoutes from './application/routes/UserRoute'
 import addressRoute from './application/routes/AddressRoute'
 import productRoute from './application/routes/ProductRoute'
+import shopRoute from './application/routes/ShopRoute'
 
 dotenv.config()
 
@@ -39,6 +40,7 @@ app.use(express.json())
 app.use('/api', userRoutes)
 app.use('/api', addressRoute)
 app.use('/api', productRoute)
+app.use('/api', shopRoute)
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

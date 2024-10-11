@@ -1,14 +1,9 @@
 import { Schema, model, Document } from 'mongoose'
 import { Role } from '../../domain/entities/User'
-
-// Type definition for Address
-type Address = {
-    street: string
-    city: string
-    state: string
-    postalCode: number
-    country: string
-}
+import { Address } from '../../domain/entities/Address'
+import { AddressSchema } from './AddressSchema'
+import { Shop } from '../../domain/entities/Shop'
+import { ShopSchema } from './ShopSchema'
 
 // Interface for User Document
 export interface IUser extends Document {
@@ -17,16 +12,8 @@ export interface IUser extends Document {
     password: string
     address: Address | null
     role: Role
+    shop?: Shop
 }
-
-// Define Address Schema
-const AddressSchema: Schema<Address> = new Schema<Address>({
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    postalCode: { type: Number, required: true },
-    country: { type: String, required: true },
-})
 
 // Define User Schema
 export const UserSchema = new Schema<IUser>(
@@ -40,6 +27,7 @@ export const UserSchema = new Schema<IUser>(
             enum: ['customer', 'admin', 'shop'],
             required: true,
         },
+        shop: { type: ShopSchema, required: false },
     },
     { timestamps: true }
 )
