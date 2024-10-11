@@ -1,4 +1,3 @@
-import { ZodError } from 'zod'
 import { LoginUsecase } from '../../domain/usecase/user/LoginUsecase'
 import { ProfileUsecase } from '../../domain/usecase/user/ProfileUsecase'
 import { SignupUsecase } from '../../domain/usecase/user/SignupUsecase'
@@ -11,6 +10,8 @@ import { Session } from 'express-session'
 import { loginSchema } from '../validate/LoginSchema'
 import { userSchema } from '../validate/UserSchema'
 import { JwtPayload } from '../../types/JwtPayload'
+import { Effect } from 'effect'
+import { ErrorHandler } from '../error/ErrorHandler'
 
 type Payload = {
     userId: string
@@ -36,104 +37,76 @@ export class UserController {
     ) {}
 
     async loginHandler(req: Request & { session: ExtSession }, res: Response) {
-        try {
-            // Validate ข้อมูลที่รับจาก request body
-            const { email, password } = loginSchema.parse(req.body)
-            const payload = await this.loginUsecase.execute(email, password)
+        // Effect สำหรับ validate ข้อมูลจาก request body
+        const validateEffect = Effect.try(() => loginSchema.parse(req.body))
 
-            // บันทึก email ลงใน session ที่เชื่อมต่อกับ Redis
+        // Effect สำหรับ login และดึง payload
+        const loginEffect = Effect.flatMap(
+            validateEffect,
+            ({ email, password }) => this.loginUsecase.execute(email, password)
+        )
+
+        const saveSessionEffect = Effect.flatMap(loginEffect, (payload) => {
             const { accessToken, refreshToken } = this.getTokens({
                 ...payload,
                 userId: payload.sub,
             })
 
+            // บันทึก Access Token ลงใน session
             req.session.access_token = accessToken
-            // เก็บ Refresh Token ใน cookie แยก (หมดอายุใน 5 วัน)
+
+            // เก็บ Refresh Token ใน cookie
             res.cookie('refresh_token', refreshToken, {
                 httpOnly: true,
                 maxAge: 1000 * 60 * 60 * 24 * 5, // 5 วัน
                 secure: false, // ใช้ true สำหรับ HTTPS
             })
 
-            res.send('Login Successful')
-        } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
-        }
+            return Effect.succeed({ message: 'Login Successful' })
+        })
+
+        // Run Effect และจัดการข้อผิดพลาด
+        Effect.runPromise(saveSessionEffect).then(
+            (msg) => res.json(msg),
+            (err) => ErrorHandler.handleError(err, res)
+        )
     }
 
-    async profileHandler(req: Request, res: Response) {
-        try {
+    profileHandler(req: Request, res: Response) {
+        // Effect สำหรับตรวจสอบ JWT payload
+        const validateEffect = Effect.try(() => {
             const payload = req.user as JwtPayload
             if (!payload || !payload.sub) res.status(401).send('Unauthorized')
-            const user = await this.profileUsecase.execute(
-                payload.sub as string
-            )
-            res.json(user).status(200)
-        } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
-        }
+            return payload.sub as string
+        })
+
+        // Effect สำหรับเรียกใช้ usecase เพื่อดึงข้อมูล profile
+        const profileEffect = Effect.flatMap(validateEffect, (userId) =>
+            this.profileUsecase.execute(userId)
+        )
+
+        // รัน Effect และจัดการผลลัพธ์หรือข้อผิดพลาด
+        Effect.runPromise(profileEffect).then(
+            (user) => res.status(200).json(user),
+            (err) => ErrorHandler.handleError(err, res)
+        )
     }
 
     async signupHandler(req: Request, res: Response) {
-        try {
-            const { name, email, password } = userSchema.parse(req.body)
-            const user = new User({
-                name,
-                email,
-                password,
-                role: 'customer',
-            })
-            await this.signupUsecase.execute(user)
+        const validateEffect = Effect.try(() => userSchema.parse(req.body))
+        const userInstanceEffect = Effect.map(
+            validateEffect,
+            ({ name, email, password }) =>
+                new User({ name, email, password, role: 'customer' })
+        )
+        const signupEffect = Effect.flatMap(userInstanceEffect, (user) =>
+            this.signupUsecase.execute(user)
+        )
 
-            res.send('signup ok')
-        } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
-        }
+        Effect.runPromise(signupEffect).then(
+            () => res.status(200).json({ message: 'signup ok' }),
+            (err) => ErrorHandler.handleError(err, res)
+        )
     }
 
     private getTokens(jwtPayload: Payload): Tokens {

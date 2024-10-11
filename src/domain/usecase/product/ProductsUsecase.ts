@@ -1,3 +1,4 @@
+import { Effect } from 'effect'
 import { HttpError } from '../../../infrastructure/errors/HttpError'
 import { ProductQuery, Products } from '../../entities/Products'
 import { IProductsRepository } from '../../interfaces/IProductsRepository'
@@ -5,11 +6,11 @@ import { IProductsRepository } from '../../interfaces/IProductsRepository'
 export class ProductsUsecase {
     constructor(private productsRepository: IProductsRepository) {}
 
-    async execute({
+    execute({
         query,
         category,
         range,
-    }: ProductQuery): Promise<Products[]> {
+    }: ProductQuery): Effect.Effect<Products[], Error> {
         // ตรวจสอบว่า end ต้องมากกว่า 0 และ start ต้องไม่ติดลบ
         if (range && range.start < 0) {
             throw new HttpError(

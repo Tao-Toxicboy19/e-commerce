@@ -1,8 +1,9 @@
+import { Effect } from 'effect'
 import { User, UserJwt } from '../entities/User'
 
 export interface IUserRepository {
-    signup(dto: User): Promise<void>
-    login(email: string, password: string): Promise<UserJwt>
-    profile(sub: string): Promise<User>
-    update(dto: User): Promise<void>
+    signup(dto: User): Effect.Effect<void, Error>
+    login(email: string, password: string): Effect.Effect<UserJwt, Error>
+    profile(sub: string): Effect.Effect<User, Error>
+    update(dto: User): Effect.Effect<void, Error>
 }

@@ -1,6 +1,8 @@
+import { Effect } from 'effect'
 import { ProductQuery, Products } from '../../domain/entities/Products'
 import { IProductsRepository } from '../../domain/interfaces/IProductsRepository'
 import { ProductModel } from '../schemas/ProductSchema'
+import { HttpError } from '../errors/HttpError'
 
 interface SearchConditions {
     name?: { $regex: string; $options: string }
@@ -9,13 +11,15 @@ interface SearchConditions {
 }
 
 export class ProductRepository implements IProductsRepository {
-    async products({
+    products({
         query,
         category,
         range,
-    }: ProductQuery): Promise<Products[]> {
-        try {
+    }: ProductQuery): Effect.Effect<Products[], Error> {
+        return Effect.tryPromise(async () => {
+            // สร้าง search conditions ตามเงื่อนไขที่ได้รับ
             let searchConditions: SearchConditions = {}
+
             if (query) searchConditions.name = { $regex: query, $options: 'i' }
             if (category)
                 searchConditions.category = { $regex: category, $options: 'i' }
@@ -26,20 +30,17 @@ export class ProductRepository implements IProductsRepository {
                 }
             }
 
-            const products = await ProductModel.find(searchConditions)
-                .select('-reviews -__v')
+            // ค้นหาผลิตภัณฑ์ตามเงื่อนไข
+            return await ProductModel.find(searchConditions)
+                .select('-reviews -__v') // ลบฟิลด์ที่ไม่ต้องการ
                 .lean()
                 .exec()
-            return products
-        } catch (error) {
-            console.error('Error fetching products:', error)
-            throw new Error('Could not retrieve products')
-        }
+        })
     }
 
-    async saveProduct(dto: Products): Promise<void> {
-        try {
-            const newProduct = new ProductModel({
+    saveProduct(dto: Products): Effect.Effect<void, Error> {
+        return Effect.tryPromise(async () => {
+            await new ProductModel({
                 name: dto.name,
                 description: dto.description,
                 price: dto.price,
@@ -48,18 +49,13 @@ export class ProductRepository implements IProductsRepository {
                 stock: dto.stock,
                 images: dto.images,
                 shop: dto.shop,
-            })
-
-            await newProduct.save()
-        } catch (error) {
-            console.error('Error saving product:', error)
-            throw new Error('Could not save product')
-        }
+            }).save()
+        })
     }
 
-    async updateProduct(id: string, dto: Products): Promise<void> {
-        try {
-            const result = await ProductModel.findByIdAndUpdate(id, {
+    updateProduct(id: string, dto: Products): Effect.Effect<void, Error> {
+        return Effect.tryPromise(async () => {
+            const product = await ProductModel.findByIdAndUpdate(id, {
                 $set: {
                     name: dto.name,
                     description: dto.description,
@@ -70,25 +66,16 @@ export class ProductRepository implements IProductsRepository {
                     images: dto.images,
                 },
             }).exec()
-
-            if (!result) {
-                throw new Error('Product not found')
+            if (!product) {
+                throw new HttpError('Product not found', 404) // ใช้ HttpError สำหรับ 404
             }
-        } catch (error) {
-            console.error('Error updating product:', error)
-            throw new Error('Could not update product')
-        }
+        })
     }
 
-    async deleteProduct(id: string): Promise<void> {
-        try {
+    deleteProduct(id: string): Effect.Effect<void, Error> {
+        return Effect.tryPromise(async () => {
             const result = await ProductModel.findByIdAndDelete(id).exec()
-            if (!result) {
-                throw new Error('Product not found')
-            }
-        } catch (error) {
-            console.error('Error deleting product:', error)
-            throw new Error('Could not delete product')
-        }
+            if (!result) throw new HttpError('Product not found', 404) // ใช้ HttpError สำหรับ 404
+        })
     }
 }

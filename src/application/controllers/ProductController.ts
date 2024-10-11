@@ -1,13 +1,13 @@
 import { Request, Response } from 'express'
 import { ProductsUsecase } from '../../domain/usecase/product/ProductsUsecase'
 import { SaveProductUsecase } from '../../domain/usecase/product/SaveProductUsecase'
-import { HttpError } from '../../infrastructure/errors/HttpError'
 import { Products } from '../../domain/entities/Products'
 import { Shop } from '../../domain/entities/Shop'
 import { productSchema } from '../validate/ProductSchema'
 import { querySchema } from '../validate/QuerySchema'
-import { ZodError } from 'zod'
 import { JwtPayload } from '../../types/JwtPayload'
+import { Effect } from 'effect'
+import { ErrorHandler } from '../error/ErrorHandler'
 
 export class ProductController {
     constructor(
@@ -15,38 +15,23 @@ export class ProductController {
         private saveProductUsecase: SaveProductUsecase // private updateProductUsecase: UpdateProductUsecase, // private deleteProductUsecase: DeleteProductUsecase
     ) {}
 
-    async productHandler(req: Request, res: Response) {
-        try {
-            const query = querySchema.parse(req.query)
-            const products = await this.prodcutsUsecase.execute({
+    productHandler(req: Request, res: Response) {
+        const validateEffect = Effect.try(() => querySchema.parse(req.query))
+        const productsEffect = Effect.flatMap(validateEffect, (query) =>
+            this.prodcutsUsecase.execute({
                 ...query,
                 range: { start: query.start, end: query.end },
             })
-            res.json(products)
-        } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
-        }
+        )
+        Effect.runPromise(productsEffect).then(
+            (products) => res.status(200).json(products),
+            (err) => ErrorHandler.handleError(err, res)
+        )
     }
 
-    async saveProductHandler(req: Request, res: Response) {
-        try {
+    saveProductHandler(req: Request, res: Response) {
+        const validateEffect = Effect.try(() => {
             const body = productSchema.parse(req.body)
-
             const payload = req.user as JwtPayload
             if (!payload || !payload.sub) res.status(401).send('Unauthorized')
 
@@ -58,29 +43,19 @@ export class ProductController {
                 },
                 name: body.shop.name,
             })
-            const product = new Products({
+            return new Products({
                 ...body,
                 shop,
             })
-            // await this.saveProductUsecase.execute(product)
-            res.json({ message: 'OK' })
-        } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
-        }
+        })
+
+        const saveEffect = Effect.flatMap(validateEffect, (product) =>
+            this.saveProductUsecase.execute(product)
+        )
+
+        Effect.runPromise(saveEffect).then(
+            () => res.status(200).json({ message: 'OK' }),
+            (err) => ErrorHandler.handleError(err, res)
+        )
     }
 }
