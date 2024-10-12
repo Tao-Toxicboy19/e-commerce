@@ -6,6 +6,7 @@ import { SaveProductUsecase } from '../../domain/usecase/product/SaveProductUsec
 import { UseGuard } from '../middleware/UseGuard'
 import { UploadImageGuard } from '../middleware/UploadImageGuard'
 import { UploadImagesUsecase } from '../../domain/usecase/uploadImage/UploadImagesUsecase'
+import { UpdateProductUsecase } from '../../domain/usecase/product/UpdateProductUsecase'
 
 const router = Router()
 
@@ -18,9 +19,11 @@ const saveProductUsecase = new SaveProductUsecase(
     productsRepository,
     uploadImageUsecase
 )
+const updateProductUsecase = new UpdateProductUsecase(productsRepository)
 const productsController = new ProductController(
     productsUsecase,
-    saveProductUsecase
+    saveProductUsecase,
+    updateProductUsecase
 )
 
 router.get('/products', (req, res) =>
@@ -32,6 +35,13 @@ router.post(
     UseGuard.shopRoleGuard,
     uploadImageGuard.getUploader().array('images'),
     (req, res) => productsController.saveProductHandler(req, res)
+)
+router.patch(
+    '/product',
+    UseGuard.jwtAuthGuard,
+    UseGuard.shopRoleGuard,
+    uploadImageGuard.getUploader().array('images'),
+    (req, res) => productsController.updateProductHandler(req, res)
 )
 
 export default router

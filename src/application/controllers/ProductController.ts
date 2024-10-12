@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { ProductsUsecase } from '../../domain/usecase/product/ProductsUsecase'
 import { SaveProductUsecase } from '../../domain/usecase/product/SaveProductUsecase'
+import { UpdateProductUsecase } from '../../domain/usecase/product/UpdateProductUsecase'
 import { productSchema } from '../validate/ProductSchema'
 import { querySchema } from '../validate/QuerySchema'
 import { JwtPayload } from '../../types/JwtPayload'
@@ -9,7 +10,8 @@ import { ErrorHandler } from '../error/ErrorHandler'
 export class ProductController {
     constructor(
         private prodcutsUsecase: ProductsUsecase,
-        private saveProductUsecase: SaveProductUsecase // private updateProductUsecase: UpdateProductUsecase, // private deleteProductUsecase: DeleteProductUsecase
+        private saveProductUsecase: SaveProductUsecase,
+        private updateProductUsecase: UpdateProductUsecase // private deleteProductUsecase: DeleteProductUsecase
     ) {}
 
     async productHandler(req: Request, res: Response) {
@@ -39,6 +41,16 @@ export class ProductController {
             res.json({ message: 'OK' })
         } catch (err) {
             ErrorHandler.handleError(err, res)
+        }
+    }
+
+    async updateProductHandler(req: Request, res: Response) {
+        try {
+            const body = productSchema.parse(req.body)
+            console.log(body)
+            res.json({ message: 'ok' }).status(200)
+        } catch (error) {
+            ErrorHandler.handleError(error, res)
         }
     }
 }

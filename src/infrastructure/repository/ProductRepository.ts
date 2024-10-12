@@ -48,17 +48,21 @@ export class ProductRepository implements IProductsRepository {
 
     async updateProduct(id: string, dto: Products): Promise<void> {
         try {
-            const product = await ProductModel.findByIdAndUpdate(id, {
-                $set: {
-                    name: dto.name,
-                    description: dto.description,
-                    price: dto.price,
-                    category: dto.category,
-                    brand: dto.brand,
-                    stock: dto.stock,
-                    images: dto.images,
-                },
-            }).exec()
+            const product = await ProductModel.findByIdAndUpdate(
+                // { _id: id, shopOwner: },
+                { _id: id },
+                {
+                    $set: {
+                        name: dto.name,
+                        description: dto.description,
+                        price: dto.price,
+                        category: dto.category,
+                        brand: dto.brand,
+                        stock: dto.stock,
+                        images: dto.images,
+                    },
+                }
+            ).exec()
 
             if (!product) throw new HttpError('Product not found', 404)
         } catch (error) {
