@@ -1,4 +1,4 @@
-import { SaveShopType } from '../../../application/validate/SaveShopSchema'
+import { SaveShopDto } from '../../../application/validate/SaveShopDto'
 import { Address } from '../../entities/Address'
 import { Shop } from '../../entities/Shop'
 import { IShopRepository } from '../../interfaces/IShopRepository'
@@ -6,7 +6,7 @@ import { IShopRepository } from '../../interfaces/IShopRepository'
 export class SaveShopUsecase {
     constructor(private shopRepository: IShopRepository) {}
 
-    async execute(userId: string, dto: SaveShopType): Promise<void> {
+    async execute(userId: string, dto: SaveShopDto): Promise<void> {
         const addressInstance = new Address({
             ...dto.address,
             postalCode: dto.address.postal_code,

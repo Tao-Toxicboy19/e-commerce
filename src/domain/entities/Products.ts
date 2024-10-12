@@ -8,6 +8,7 @@ export type ProductQuery = {
 }
 
 export class Products {
+    public id?: string
     public name: string
     public description: string
     public price: number
@@ -18,6 +19,7 @@ export class Products {
     public shopOwner: Types.ObjectId
 
     constructor({
+        id,
         name,
         description,
         price,
@@ -27,6 +29,7 @@ export class Products {
         images,
         shopOwner,
     }: {
+        id?: string
         name: string
         description: string
         price: number
@@ -36,6 +39,7 @@ export class Products {
         images: Images[]
         shopOwner: Types.ObjectId
     }) {
+        this.id = id
         this.name = name
         this.description = description
         this.price = price

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const productSchema = z.object({
+export const productDto = z.object({
     name: z.string(),
     description: z.string(),
     price: z
@@ -17,4 +17,4 @@ export const productSchema = z.object({
         .refine((val) => !isNaN(val), { message: 'Invalid number' }), // ตรวจสอบว่าเป็น number จริง
 })
 
-export type ProductType = z.infer<typeof productSchema>
+export type ProductDto = z.infer<typeof productDto>

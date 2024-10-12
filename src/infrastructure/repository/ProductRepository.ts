@@ -29,10 +29,10 @@ export class ProductRepository implements IProductsRepository {
 
             return await ProductModel.find(searchConditions)
                 .select('-reviews -__v')
+                .populate('shopOwner', 'shop')
                 .lean()
                 .exec()
         } catch (error) {
-            console.error('Error fetching products:', error)
             throw new HttpError('Could not retrieve products', 400)
         }
     }
@@ -41,16 +41,14 @@ export class ProductRepository implements IProductsRepository {
         try {
             await new ProductModel(dto).save()
         } catch (error) {
-            console.error('Error saving product:', error)
             throw new HttpError('Could not save product', 400)
         }
     }
 
-    async updateProduct(id: string, dto: Products): Promise<void> {
+    async updateProduct(dto: Products): Promise<void> {
         try {
             const product = await ProductModel.findByIdAndUpdate(
-                // { _id: id, shopOwner: },
-                { _id: id },
+                { _id: dto.id, shopOwner: dto.shopOwner },
                 {
                     $set: {
                         name: dto.name,
@@ -63,10 +61,8 @@ export class ProductRepository implements IProductsRepository {
                     },
                 }
             ).exec()
-
             if (!product) throw new HttpError('Product not found', 404)
         } catch (error) {
-            console.error('Error updating product:', error)
             throw new HttpError('Could not update product', 400)
         }
     }
@@ -76,7 +72,6 @@ export class ProductRepository implements IProductsRepository {
             const product = await ProductModel.findByIdAndDelete(id).exec()
             if (!product) throw new HttpError('Product not found', 404)
         } catch (error) {
-            console.error('Error deleting product:', error)
             throw new HttpError('Could not delete product', 400)
         }
     }

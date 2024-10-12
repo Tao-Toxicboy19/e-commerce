@@ -1,11 +1,11 @@
-import { UserType } from '../../../application/validate/UserSchema'
+import { UserDto } from '../../../application/validate/UserDto'
 import { User } from '../../entities/User'
 import { IUserRepository } from '../../interfaces/IUserRepository'
 
 export class SignupUsecase {
     constructor(private userRepository: IUserRepository) {}
 
-    async execute(dto: UserType): Promise<void> {
+    async execute(dto: UserDto): Promise<void> {
         const user = new User({
             ...dto,
             role: 'customer',

@@ -1,9 +1,9 @@
 import { Types } from 'mongoose'
-import { ProductType } from '../../../application/validate/ProductSchema'
 import { HttpError } from '../../../infrastructure/errors/HttpError'
 import { Products } from '../../entities/Products'
 import { IProductsRepository } from '../../interfaces/IProductsRepository'
 import { UploadImagesUsecase } from '../uploadImage/UploadImagesUsecase'
+import { ProductDto } from '../../../application/validate/products/ProductDto'
 
 export class SaveProductUsecase {
     constructor(
@@ -17,16 +17,18 @@ export class SaveProductUsecase {
         files,
     }: {
         userId: string
-        dto: ProductType
+        dto: ProductDto
         files: Express.Multer.File[]
     }): Promise<void> {
+        if (!files || !files.length)
+            throw new HttpError('No images uploaded', 400)
+
         if (dto.price <= 0) {
             throw new HttpError('Price must be greater than 0.', 400)
         }
         if (dto.stock <= 0) {
             throw new HttpError('Stock must be greater than 0.', 400)
         }
-
         const uploadedImages = await this.uploadImagesUsecase.execute(files)
 
         const productInstance = new Products({
@@ -34,7 +36,7 @@ export class SaveProductUsecase {
             images: uploadedImages,
             shopOwner: new Types.ObjectId(userId),
         })
-
+        console.log(productInstance)
         return this.productsRepository.saveProduct(productInstance)
     }
 }

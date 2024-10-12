@@ -3,14 +3,13 @@ import { ProfileUsecase } from '../../domain/usecase/user/ProfileUsecase'
 import { SignupUsecase } from '../../domain/usecase/user/SignupUsecase'
 import { UpdateUsecase } from '../../domain/usecase/user/UpdateUsecase'
 import { Request, Response } from 'express'
-import { User } from '../../domain/entities/User'
 import { HttpError } from '../../infrastructure/errors/HttpError'
 import jwt from 'jsonwebtoken'
 import { Session } from 'express-session'
-import { loginSchema } from '../validate/LoginSchema'
-import { userSchema } from '../validate/UserSchema'
 import { JwtPayload } from '../../types/JwtPayload'
 import { ErrorHandler } from '../error/ErrorHandler'
+import { loginDto } from '../validate/LoginDto'
+import { userDto } from '../validate/UserDto'
 
 type Payload = {
     userId: string
@@ -38,7 +37,7 @@ export class UserController {
     async loginHandler(req: Request & { session: ExtSession }, res: Response) {
         try {
             // Validate ข้อมูลที่รับจาก request body
-            const { email, password } = loginSchema.parse(req.body)
+            const { email, password } = loginDto.parse(req.body)
             const payload = await this.loginUsecase.execute(email, password)
 
             // บันทึก email ลงใน session ที่เชื่อมต่อกับ Redis
@@ -73,7 +72,7 @@ export class UserController {
 
     async signupHandler(req: Request, res: Response) {
         try {
-            const body = userSchema.parse(req.body)
+            const body = userDto.parse(req.body)
             await this.signupUsecase.execute(body)
 
             res.send('signup ok')

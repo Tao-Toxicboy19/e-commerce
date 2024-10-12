@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const addressSchema = z.object({
+export const addressDto = z.object({
     street: z.string(),
     city: z.string(),
     state: z.string(),
@@ -8,4 +8,4 @@ export const addressSchema = z.object({
     country: z.string(),
 })
 
-export type AddressType = z.infer<typeof addressSchema>
+export type AddressDto = z.infer<typeof addressDto>

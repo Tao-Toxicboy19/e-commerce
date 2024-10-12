@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const querySchema = z.object({
+export const queryDto = z.object({
     query: z.string().optional(),
     category: z.string().optional(),
     start: z

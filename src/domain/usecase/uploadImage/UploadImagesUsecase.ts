@@ -11,9 +11,6 @@ cloudinary.config({
 
 export class UploadImagesUsecase {
     async execute(files: Express.Multer.File[]): Promise<Images[]> {
-        if (!files || !files.length)
-            throw new HttpError('No images uploaded', 400)
-
         // ใช้ Promise ในการอัปโหลดแต่ละไฟล์ไปยัง Cloudinary
         const uploadPromises = files.map((file) => {
             return new Promise<Images>((resolve, reject) => {
