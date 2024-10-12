@@ -1,7 +1,6 @@
 import { Schema, model, Document, Types } from 'mongoose'
-import { Review, ReviewSchema } from './ReviewSchema'
-import { Shop } from '../../domain/entities/Shop'
-import { ShopSchema } from './ShopSchema'
+import { IReview, ReviewSchema } from './ReviewSchema'
+import { IImages, ImagesSchema } from './ImageSchema'
 
 export interface IProduct extends Document {
     name: string
@@ -10,9 +9,9 @@ export interface IProduct extends Document {
     category: string
     brand: string
     stock: number
-    images: string[]
-    reviews: Review[]
-    shop: Shop
+    images: IImages[]
+    reviews: IReview[]
+    shopOwner: Types.ObjectId
 }
 
 // Define Product Schema
@@ -23,9 +22,14 @@ export const ProductSchema: Schema<IProduct> = new Schema({
     category: { type: String, required: true, index: true }, // เพิ่ม index ที่ category
     brand: { type: String, required: true },
     stock: { type: Number, required: true },
-    images: { type: [String], required: true },
+    images: { type: [ImagesSchema], required: true },
     reviews: [ReviewSchema],
-    shop: { type: ShopSchema },
+    shopOwner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        index: true,
+        required: true,
+    },
 })
 
 // Create the Product model

@@ -1,7 +1,7 @@
-import { Schema } from "mongoose"
+import { Schema } from 'mongoose'
 
 // Type definition for Address
-type Address = {
+interface IAddress extends Document {
     street: string
     city: string
     state: string
@@ -10,7 +10,7 @@ type Address = {
 }
 
 // Define Address Schema
-export const AddressSchema: Schema<Address> = new Schema<Address>({
+export const AddressSchema: Schema<IAddress> = new Schema<IAddress>({
     street: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },

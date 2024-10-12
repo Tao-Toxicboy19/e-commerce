@@ -9,7 +9,7 @@ export interface IShop extends Document {
 }
 
 // Define Shop Schema
-export const ShopSchema: Schema<IShop> = new Schema({
+export const ShopSchema: Schema<IShop> = new Schema<IShop>({
     owner: { type: String, required: true },
     name: { type: String, required: true, index: true }, // เพิ่ม index ที่ name
     address: { type: AddressSchema, required: true },

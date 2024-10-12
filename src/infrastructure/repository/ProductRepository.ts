@@ -39,16 +39,7 @@ export class ProductRepository implements IProductsRepository {
 
     async saveProduct(dto: Products): Promise<void> {
         try {
-            await new ProductModel({
-                name: dto.name,
-                description: dto.description,
-                price: dto.price,
-                category: dto.category,
-                brand: dto.brand,
-                stock: dto.stock,
-                images: dto.images,
-                shop: dto.shop,
-            }).save()
+            await new ProductModel(dto).save()
         } catch (error) {
             console.error('Error saving product:', error)
             throw new HttpError('Could not save product', 400)

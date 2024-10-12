@@ -1,4 +1,5 @@
-import { Shop } from './Shop'
+import { Types } from 'mongoose'
+import { Images } from './Images'
 
 export type ProductQuery = {
     query?: string
@@ -13,8 +14,8 @@ export class Products {
     public category: string
     public brand: string
     public stock: number
-    public images: string[]
-    public shop: Shop
+    public images: Images[]
+    public shopOwner: Types.ObjectId
 
     constructor({
         name,
@@ -24,7 +25,7 @@ export class Products {
         brand,
         stock,
         images,
-        shop,
+        shopOwner,
     }: {
         name: string
         description: string
@@ -32,8 +33,8 @@ export class Products {
         category: string
         brand: string
         stock: number
-        images: string[]
-        shop: Shop
+        images: Images[]
+        shopOwner: Types.ObjectId
     }) {
         this.name = name
         this.description = description
@@ -42,6 +43,6 @@ export class Products {
         this.brand = brand
         this.stock = stock
         this.images = images
-        this.shop = shop
+        this.shopOwner = shopOwner
     }
 }

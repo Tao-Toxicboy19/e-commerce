@@ -7,3 +7,5 @@ export const addressSchema = z.object({
     postal_code: z.number().min(4),
     country: z.string(),
 })
+
+export type AddressType = z.infer<typeof addressSchema>

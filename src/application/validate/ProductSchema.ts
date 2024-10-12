@@ -1,16 +1,18 @@
-import { z } from "zod";
-import { addressSchema } from "./AddressSchema";
+import { z } from 'zod'
 
 export const productSchema = z.object({
     name: z.string(),
     description: z.string(),
-    price: z.number(),
+    price: z
+        .string()
+        .transform((val) => parseFloat(val)) // แปลงจาก string เป็น number
+        .refine((val) => !isNaN(val), { message: 'Invalid number' }), // ตรวจสอบว่าเป็น number จริง
     category: z.string(),
     brand: z.string(),
-    stock: z.number(),
-    images: z.string().array(),
-    shop: z.object({
-        name: z.string(),
-        address: addressSchema, // อ้างอิง addressSchema
-    }),
+    stock: z
+        .string()
+        .transform((val) => parseInt(val, 10)) // แปลงจาก string เป็น number
+        .refine((val) => !isNaN(val), { message: 'Invalid number' }), // ตรวจสอบว่าเป็น number จริง
 })
+
+export type ProductType = z.infer<typeof productSchema>

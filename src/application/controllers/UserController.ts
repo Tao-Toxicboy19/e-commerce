@@ -1,4 +1,3 @@
-import { ZodError } from 'zod'
 import { LoginUsecase } from '../../domain/usecase/user/LoginUsecase'
 import { ProfileUsecase } from '../../domain/usecase/user/ProfileUsecase'
 import { SignupUsecase } from '../../domain/usecase/user/SignupUsecase'
@@ -65,9 +64,7 @@ export class UserController {
     async profileHandler(req: Request, res: Response) {
         try {
             const payload = req.user as JwtPayload
-            const user = await this.profileUsecase.execute(
-                payload.sub as string
-            )
+            const user = await this.profileUsecase.execute(payload.sub)
             res.json(user).status(200)
         } catch (err) {
             ErrorHandler.handleError(err, res)
@@ -76,14 +73,8 @@ export class UserController {
 
     async signupHandler(req: Request, res: Response) {
         try {
-            const { name, email, password } = userSchema.parse(req.body)
-            const user = new User({
-                name,
-                email,
-                password,
-                role: 'customer',
-            })
-            await this.signupUsecase.execute(user)
+            const body = userSchema.parse(req.body)
+            await this.signupUsecase.execute(body)
 
             res.send('signup ok')
         } catch (err) {

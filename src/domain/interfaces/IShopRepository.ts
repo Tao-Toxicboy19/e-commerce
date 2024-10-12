@@ -1,5 +1,5 @@
 import { Shop } from '../entities/Shop'
 
 export interface IShopRepository {
-    saveShop(id: string, dto: Shop): Promise<void>
+    saveShop(userId: string, dto: Shop): Promise<void>
 }

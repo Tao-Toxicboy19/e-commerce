@@ -6,3 +6,5 @@ export const saveShopSchema = z.object({
     name: z.string(),
     address: addressSchema,
 })
+
+export type SaveShopType = z.infer<typeof saveShopSchema>

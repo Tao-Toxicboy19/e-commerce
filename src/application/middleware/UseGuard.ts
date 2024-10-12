@@ -38,9 +38,35 @@ export class UseGuard {
         res: Response,
         next: NextFunction
     ): void {
-        if (req.user && (req.user as JwtPayload).role === 'shop') {
-            next() // ถ้า role เป็น 'shop' ให้ผ่านไป middleware ต่อไปได้
+        try {
+            if (req.user && (req.user as JwtPayload).role === 'shop') {
+                next() // ถ้า role เป็น 'shop' ให้ผ่านไป middleware ต่อไปได้
+            }
+        } catch (error) {
+            res.status(403).json({ message: 'Forbidden: Requires shop role' })
         }
-        res.status(403).json({ message: 'Forbidden: Requires shop role' })
     }
 }
+
+// {
+//     "name": "Smartphone",
+//     "description": "The latest model of smartphone with advanced features",
+//     "price": 999.99,
+//     "category": "electronics",
+//     "brand": "BrandX",
+//     "stock": 100,
+//     "images": [
+//         "image1.jpg",
+//         "image2.jpg"
+//     ],
+//     "shop": {
+//         "name": "Tech Store",
+//         "address": {
+//             "street": "123 Main St",
+//             "city": "Bangkok",
+//             "state": "BKK",
+//             "postal_code": 10100,
+//             "country": "Thailand"
+//         }
+//     }
+// }
