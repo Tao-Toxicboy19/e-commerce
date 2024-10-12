@@ -4,6 +4,7 @@ import { Address } from '../../domain/entities/Address'
 import { AddressUsecase } from '../../domain/usecase/address/AddressUsecase'
 import { addressSchema } from '../validate/AddressSchema'
 import { JwtPayload } from '../../types/JwtPayload'
+import { ErrorHandler } from '../error/ErrorHandler'
 
 export class AddressController {
     constructor(private addressUsecase: AddressUsecase) {}
@@ -14,7 +15,6 @@ export class AddressController {
             const body = addressSchema.parse(req.body)
 
             const payload = req.user as JwtPayload
-            if (!payload || !payload.sub) res.status(401).send('Unauthorized')
             const address = new Address({
                 ...body,
                 postalCode: body.postal_code,
@@ -25,17 +25,7 @@ export class AddressController {
 
             res.status(200).send('Address updated successfully')
         } catch (err) {
-            if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err instanceof Error ? err.message : String(err),
-                    statusCode: 500,
-                })
-            }
+            ErrorHandler.handleError(err, res)
         }
     }
 }

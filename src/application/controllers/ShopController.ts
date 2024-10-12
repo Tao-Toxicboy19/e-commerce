@@ -6,6 +6,7 @@ import { saveShopSchema } from '../validate/SaveShopSchema'
 import { Shop } from '../../domain/entities/Shop'
 import { Address } from '../../domain/entities/Address'
 import { JwtPayload } from '../../types/JwtPayload'
+import { ErrorHandler } from '../error/ErrorHandler'
 
 export class ShopController {
     constructor(private saveShopUsecase: SaveShopUsecase) {}
@@ -15,7 +16,6 @@ export class ShopController {
             const { owner, name, address } = saveShopSchema.parse(req.body)
 
             const payload = req.user as JwtPayload
-            if (!payload || !payload.sub) res.status(401).send('Unauthorized')
 
             const addressInstance = new Address({
                 ...address,
@@ -34,22 +34,7 @@ export class ShopController {
 
             res.json({ message: 'OK' })
         } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
+            ErrorHandler.handleError(err,res)
         }
     }
 }

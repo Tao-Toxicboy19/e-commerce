@@ -1,5 +1,6 @@
 import { ProductQuery, Products } from '../../domain/entities/Products'
 import { IProductsRepository } from '../../domain/interfaces/IProductsRepository'
+import { HttpError } from '../errors/HttpError'
 import { ProductModel } from '../schemas/ProductSchema'
 
 interface SearchConditions {
@@ -26,20 +27,19 @@ export class ProductRepository implements IProductsRepository {
                 }
             }
 
-            const products = await ProductModel.find(searchConditions)
+            return await ProductModel.find(searchConditions)
                 .select('-reviews -__v')
                 .lean()
                 .exec()
-            return products
         } catch (error) {
             console.error('Error fetching products:', error)
-            throw new Error('Could not retrieve products')
+            throw new HttpError('Could not retrieve products', 400)
         }
     }
 
     async saveProduct(dto: Products): Promise<void> {
         try {
-            const newProduct = new ProductModel({
+            await new ProductModel({
                 name: dto.name,
                 description: dto.description,
                 price: dto.price,
@@ -48,18 +48,16 @@ export class ProductRepository implements IProductsRepository {
                 stock: dto.stock,
                 images: dto.images,
                 shop: dto.shop,
-            })
-
-            await newProduct.save()
+            }).save()
         } catch (error) {
             console.error('Error saving product:', error)
-            throw new Error('Could not save product')
+            throw new HttpError('Could not save product', 400)
         }
     }
 
     async updateProduct(id: string, dto: Products): Promise<void> {
         try {
-            const result = await ProductModel.findByIdAndUpdate(id, {
+            const product = await ProductModel.findByIdAndUpdate(id, {
                 $set: {
                     name: dto.name,
                     description: dto.description,
@@ -71,24 +69,20 @@ export class ProductRepository implements IProductsRepository {
                 },
             }).exec()
 
-            if (!result) {
-                throw new Error('Product not found')
-            }
+            if (!product) throw new HttpError('Product not found', 404)
         } catch (error) {
             console.error('Error updating product:', error)
-            throw new Error('Could not update product')
+            throw new HttpError('Could not update product', 400)
         }
     }
 
     async deleteProduct(id: string): Promise<void> {
         try {
-            const result = await ProductModel.findByIdAndDelete(id).exec()
-            if (!result) {
-                throw new Error('Product not found')
-            }
+            const product = await ProductModel.findByIdAndDelete(id).exec()
+            if (!product) throw new HttpError('Product not found', 404)
         } catch (error) {
             console.error('Error deleting product:', error)
-            throw new Error('Could not delete product')
+            throw new HttpError('Could not delete product', 400)
         }
     }
 }

@@ -1,5 +1,5 @@
-import { Address } from "../entities/Address";
+import { Address } from '../entities/Address'
 
 export interface IAddressRepository {
-    address(sub: string, dto: Address): Promise<string>
+    address(sub: string, dto: Address): Promise<void>
 }

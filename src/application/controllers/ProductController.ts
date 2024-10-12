@@ -8,6 +8,7 @@ import { productSchema } from '../validate/ProductSchema'
 import { querySchema } from '../validate/QuerySchema'
 import { ZodError } from 'zod'
 import { JwtPayload } from '../../types/JwtPayload'
+import { ErrorHandler } from '../error/ErrorHandler'
 
 export class ProductController {
     constructor(
@@ -24,22 +25,7 @@ export class ProductController {
             })
             res.json(products)
         } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
+           ErrorHandler.handleError(err,res)
         }
     }
 
@@ -48,7 +34,6 @@ export class ProductController {
             const body = productSchema.parse(req.body)
 
             const payload = req.user as JwtPayload
-            if (!payload || !payload.sub) res.status(401).send('Unauthorized')
 
             const shop = new Shop({
                 owner: payload.sub as string,
@@ -65,22 +50,7 @@ export class ProductController {
             // await this.saveProductUsecase.execute(product)
             res.json({ message: 'OK' })
         } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
+           ErrorHandler.handleError(err,res)
         }
     }
 }

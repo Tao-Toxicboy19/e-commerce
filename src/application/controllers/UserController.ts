@@ -11,6 +11,7 @@ import { Session } from 'express-session'
 import { loginSchema } from '../validate/LoginSchema'
 import { userSchema } from '../validate/UserSchema'
 import { JwtPayload } from '../../types/JwtPayload'
+import { ErrorHandler } from '../error/ErrorHandler'
 
 type Payload = {
     userId: string
@@ -57,50 +58,19 @@ export class UserController {
 
             res.send('Login Successful')
         } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
+            ErrorHandler.handleError(err, res)
         }
     }
 
     async profileHandler(req: Request, res: Response) {
         try {
             const payload = req.user as JwtPayload
-            if (!payload || !payload.sub) res.status(401).send('Unauthorized')
             const user = await this.profileUsecase.execute(
                 payload.sub as string
             )
             res.json(user).status(200)
         } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
+            ErrorHandler.handleError(err, res)
         }
     }
 
@@ -117,22 +87,7 @@ export class UserController {
 
             res.send('signup ok')
         } catch (err) {
-            if (err instanceof ZodError) {
-                res.status(400).send({
-                    message: err.errors,
-                    statusCode: 400,
-                })
-            } else if (err instanceof HttpError) {
-                res.status(err.statusCode).send({
-                    message: err.message,
-                    statusCode: err.statusCode,
-                })
-            } else {
-                res.status(500).send({
-                    message: err,
-                    statusCode: 500,
-                })
-            }
+            ErrorHandler.handleError(err, res)
         }
     }
 

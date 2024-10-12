@@ -1,5 +1,6 @@
 import { Shop } from '../../domain/entities/Shop'
 import { IShopRepository } from '../../domain/interfaces/IShopRepository'
+import { HttpError } from '../errors/HttpError'
 import { UserModel } from '../schemas/UserSchema'
 
 export class ShopRepository implements IShopRepository {
@@ -13,6 +14,6 @@ export class ShopRepository implements IShopRepository {
             { new: true, runValidators: true }
         ).exec()
 
-        if (!shop) throw new Error('User not found or update failed.')
+        if (!shop) throw new HttpError('User not found or update failed.', 404)
     }
 }
