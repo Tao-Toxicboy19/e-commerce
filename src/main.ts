@@ -9,6 +9,7 @@ import addressRoute from './application/routes/AddressRoute'
 import productRoute from './application/routes/ProductRoute'
 import shopRoute from './application/routes/ShopRoute'
 import cartRoute from './application/routes/CartRoute'
+import categoriesRoute from './application/routes/CategoriesRoute'
 
 dotenv.config()
 
@@ -43,6 +44,7 @@ app.use('/api', addressRoute)
 app.use('/api', productRoute)
 app.use('/api', shopRoute)
 app.use('/api', cartRoute)
+app.use('/api', categoriesRoute)
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

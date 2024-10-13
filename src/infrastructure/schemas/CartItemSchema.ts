@@ -1,6 +1,6 @@
 import { model, Schema, Types } from 'mongoose'
 
-export interface ICartItem extends Document {
+export interface ICartItem {
     productId: Types.ObjectId
     quantity: number
     subtotal: number
@@ -16,5 +16,3 @@ export const CartItemSchema: Schema<ICartItem> = new Schema<ICartItem>({
         set: (val: number) => Math.round(val * 100) / 100, // เก็บทศนิยมแค่ 2 ตำแหน่ง
     },
 })
-
-export const CartItemModel = model<ICartItem>('CartItem', CartItemSchema)

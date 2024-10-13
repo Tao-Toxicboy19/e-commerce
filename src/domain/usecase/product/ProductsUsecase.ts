@@ -1,6 +1,9 @@
 import { HttpError } from '../../../infrastructure/errors/HttpError'
-import { ProductQuery, ProductsEntities } from '../../entities/ProductsEntities'
-import { IProductsRepository } from '../../interfaces/IProductsRepository'
+import { ProductsEntities } from '../../entities/ProductsEntities'
+import {
+    FindProduct,
+    IProductsRepository,
+} from '../../interfaces/IProductsRepository'
 
 export class ProductsUsecase {
     constructor(private productsRepository: IProductsRepository) {}
@@ -9,7 +12,7 @@ export class ProductsUsecase {
         query,
         category,
         range,
-    }: ProductQuery): Promise<ProductsEntities[]> {
+    }: FindProduct): Promise<ProductsEntities[]> {
         // ตรวจสอบว่า end ต้องมากกว่า 0 และ start ต้องไม่ติดลบ
         if (range && range.start < 0) {
             throw new HttpError(

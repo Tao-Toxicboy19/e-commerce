@@ -1,6 +1,11 @@
-import { ProductQuery, ProductsEntities} from '../../domain/entities/ProductsEntities'
-import { IProductsRepository } from '../../domain/interfaces/IProductsRepository'
+import { Types } from 'mongoose'
+import { ProductsEntities } from '../../domain/entities/ProductsEntities'
+import {
+    FindProduct,
+    IProductsRepository,
+} from '../../domain/interfaces/IProductsRepository'
 import { HttpError } from '../errors/HttpError'
+import { CategoriesModel } from '../schemas/CategoriesSchema'
 import { ProductModel } from '../schemas/ProductSchema'
 
 interface SearchConditions {
@@ -14,7 +19,7 @@ export class ProductRepository implements IProductsRepository {
         query,
         category,
         range,
-    }: ProductQuery): Promise<ProductsEntities[]> {
+    }: FindProduct): Promise<ProductsEntities[]> {
         try {
             let searchConditions: SearchConditions = {}
             if (query) searchConditions.name = { $regex: query, $options: 'i' }
@@ -39,7 +44,31 @@ export class ProductRepository implements IProductsRepository {
 
     async saveProduct(dto: ProductsEntities): Promise<void> {
         try {
-            await new ProductModel(dto).save()
+            // บันทึก product ใหม่
+            const product = await new ProductModel(dto).save()
+
+            // ตรวจสอบว่า category ที่ต้องการมีอยู่ใน DB หรือไม่
+            let category = await CategoriesModel.findOne({
+                name: dto.category,
+            })
+                .select('name')
+                .exec()
+
+            if (!category) {
+                // ถ้า category ไม่มี ให้สร้าง category ใหม่
+                category = new CategoriesModel({
+                    name: dto.category,
+                    cout: [product._id as Types.ObjectId], // แปลง _id ให้เป็น Types.ObjectId
+                })
+            } else {
+                // ถ้ามี category แล้ว ให้เพิ่ม productId เข้าไปใน cout array
+                if (!category.cout.includes(product._id as Types.ObjectId)) {
+                    category.cout.push(product._id as Types.ObjectId)
+                }
+            }
+
+            // บันทึกการเปลี่ยนแปลงใน category
+            await category.save()
         } catch (error) {
             throw new HttpError('Could not save product', 400)
         }

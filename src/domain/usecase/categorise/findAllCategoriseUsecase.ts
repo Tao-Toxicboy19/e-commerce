@@ -1,10 +1,10 @@
 import { CategoriesEntities } from '../../entities/CategoriesEntities'
-import { ICategoriseRepository } from '../../interfaces/ICategoriseRepository'
+import { ICategoriesRepository } from '../../interfaces/ICategoriesRepository'
 
-export class FindAllCategorise {
-    constructor(private categoriseRepository: ICategoriseRepository) {}
+export class FindAllCategoriseUsecase {
+    constructor(private categoriesRepository: ICategoriesRepository) {}
 
     async execute(): Promise<CategoriesEntities[]> {
-        return this.categoriseRepository.findAllCategorise()
+        return this.categoriesRepository.findAllCategorise()
     }
 }

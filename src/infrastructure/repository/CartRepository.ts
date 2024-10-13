@@ -7,7 +7,6 @@ import { HttpError } from '../errors/HttpError'
 import { CartModel } from '../schemas/CartSchema'
 import { ProductModel } from '../schemas/ProductSchema'
 import { CartEntities } from '../../domain/entities/CartEntities'
-import { CartItemModel } from '../schemas/CartItemSchema'
 
 export class CartRepository implements ICartRepository {
     async cart(userId: string): Promise<CartEntities> {
@@ -60,13 +59,11 @@ export class CartRepository implements ICartRepository {
                     cart.items[itemIndex].quantity * product.price
             } else {
                 // ถ้าไม่พบสินค้า -> เพิ่มสินค้าใหม่เข้าไปใน items
-                cart.items.push(
-                    new CartItemModel({
-                        productId: new Types.ObjectId(productId),
-                        quantity: 1,
-                        subtotal: product.price,
-                    })
-                )
+                cart.items.push({
+                    productId: new Types.ObjectId(productId),
+                    quantity: 1,
+                    subtotal: product.price,
+                })
             }
 
             // คำนวณยอดรวม (totalPrice และ totalQuantity) ใหม่

@@ -1,5 +1,5 @@
 import { CategoriesEntities } from '../entities/CategoriesEntities'
 
-export interface ICategoriseRepository {
+export interface ICategoriesRepository {
     findAllCategorise(): Promise<CategoriesEntities[]>
 }

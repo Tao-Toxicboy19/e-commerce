@@ -1,12 +1,6 @@
 import { Types } from 'mongoose'
 import { ImagesEntities } from './ImagesEntities'
 
-export type ProductQuery = {
-    query?: string
-    category?: string
-    range?: { start: number; end: number }
-}
-
 export class ProductsEntities {
     public id?: string
     public name: string
