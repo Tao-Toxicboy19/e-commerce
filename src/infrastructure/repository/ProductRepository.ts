@@ -1,4 +1,4 @@
-import { ProductQuery, Products } from '../../domain/entities/Products'
+import { ProductQuery, ProductsEntities} from '../../domain/entities/ProductsEntities'
 import { IProductsRepository } from '../../domain/interfaces/IProductsRepository'
 import { HttpError } from '../errors/HttpError'
 import { ProductModel } from '../schemas/ProductSchema'
@@ -14,7 +14,7 @@ export class ProductRepository implements IProductsRepository {
         query,
         category,
         range,
-    }: ProductQuery): Promise<Products[]> {
+    }: ProductQuery): Promise<ProductsEntities[]> {
         try {
             let searchConditions: SearchConditions = {}
             if (query) searchConditions.name = { $regex: query, $options: 'i' }
@@ -37,7 +37,7 @@ export class ProductRepository implements IProductsRepository {
         }
     }
 
-    async saveProduct(dto: Products): Promise<void> {
+    async saveProduct(dto: ProductsEntities): Promise<void> {
         try {
             await new ProductModel(dto).save()
         } catch (error) {
@@ -45,7 +45,7 @@ export class ProductRepository implements IProductsRepository {
         }
     }
 
-    async updateProduct(dto: Products): Promise<void> {
+    async updateProduct(dto: ProductsEntities): Promise<void> {
         try {
             const product = await ProductModel.findByIdAndUpdate(
                 { _id: dto.id, shopOwner: dto.shopOwner },

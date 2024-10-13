@@ -1,19 +1,13 @@
-import { Shop } from './Shop'
+import { ShopEntities } from './ShopEntities'
 
 export type Role = 'customer' | 'admin' | 'shop'
 
-export type UserJwt = {
-    sub: string
-    email: string
-    role: string
-}
-
-export class User {
+export class UserEntities {
     public name: string
     public email: string
     public password: string
     public role: Role
-    public shop?: Shop
+    public shop?: ShopEntities
     constructor({
         name,
         email,
@@ -25,7 +19,7 @@ export class User {
         email: string
         password: string
         role: Role
-        shop?: Shop
+        shop?: ShopEntities
     }) {
         this.name = name
         this.email = email

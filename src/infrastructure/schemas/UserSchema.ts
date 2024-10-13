@@ -1,18 +1,16 @@
 import { Schema, model, Document } from 'mongoose'
-import { Role } from '../../domain/entities/User'
-import { Address } from '../../domain/entities/Address'
-import { AddressSchema } from './AddressSchema'
-import { Shop } from '../../domain/entities/Shop'
-import { ShopSchema } from './ShopSchema'
+import { Role } from '../../domain/entities/UserEntities'
+import { AddressSchema, IAddress } from './AddressSchema'
+import { IShop, ShopSchema } from './ShopSchema'
 
 // Interface for User Document
 export interface IUser extends Document {
     name: string
     email: string
     password: string
-    address: Address | null
+    address: IAddress | null
     role: Role
-    shop?: Shop
+    shop?: IShop
 }
 
 // Define User Schema

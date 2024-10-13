@@ -46,7 +46,7 @@ router.patch(
     '/product',
     UseGuard.jwtAuthGuard,
     UseGuard.shopRoleGuard,
-    uploadImageGuard.getUploader().array('images'),
+    uploadImageGuard.getUploader().array('im'),
     (req, res) => productsController.updateProductHandler(req, res)
 )
 router.delete(

@@ -1,9 +1,9 @@
 import { Types } from 'mongoose'
-import { CartItem } from './CartItem'
+import { CartItemEntities } from './CartItemEntities'
 
-export class Cart {
+export class CartEntities {
     public userId: Types.ObjectId
-    public items: CartItem[]
+    public items: CartItemEntities[]
     public totalPrice: number
     public totalQuantity: number
 
@@ -14,7 +14,7 @@ export class Cart {
         totalQuantity,
     }: {
         userId: Types.ObjectId
-        items: CartItem[]
+        items: CartItemEntities[]
         totalPrice: number
         totalQuantity: number
     }) {

@@ -1,4 +1,4 @@
-export class Images {
+export class ImagesEntities {
     public asset_id: string
     public public_id: string
     public url: string

@@ -1,4 +1,4 @@
-export class Address {
+export class AddressEntities {
     public street: string
     public city: string
     public state: string

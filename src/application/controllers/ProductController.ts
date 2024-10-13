@@ -37,7 +37,6 @@ export class ProductController {
             const payload = req.user as JwtPayload
 
             const files = req.files as Express.Multer.File[]
-
             await this.saveProductUsecase.execute({
                 userId: payload.sub,
                 dto: body,

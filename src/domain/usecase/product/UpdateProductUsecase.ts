@@ -1,9 +1,9 @@
 import { Types } from 'mongoose'
 import { UpdateProductDto } from '../../../application/validate/products/UpdateProductDto'
-import { Images } from '../../entities/Images'
-import { Products } from '../../entities/Products'
 import { IProductsRepository } from '../../interfaces/IProductsRepository'
 import { UploadImagesUsecase } from '../uploadImage/UploadImagesUsecase'
+import { ImagesEntities } from '../../entities/ImagesEntities'
+import { ProductsEntities } from '../../entities/ProductsEntities'
 
 export class UpdateProductUsecase {
     constructor(
@@ -20,12 +20,12 @@ export class UpdateProductUsecase {
         dto: UpdateProductDto
         files: Express.Multer.File[]
     }): Promise<void> {
-        let uploadedImages: Images[] = []
+        let uploadedImages: ImagesEntities[] = []
 
         if (files)
             uploadedImages = await this.uploadImagesUsecase.execute(files)
 
-        const productInstance = new Products({
+        const productInstance = new ProductsEntities({
             id: dto.id,
             name: dto.name,
             description: dto.description,

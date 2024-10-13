@@ -1,10 +1,9 @@
-import { Schema, Types } from 'mongoose'
-import { CartItem } from '../../domain/entities/CartItem'
-import { CartItemSchema } from './CartItemSchema'
+import { model, Schema, Types } from 'mongoose'
+import { CartItemSchema, ICartItem } from './CartItemSchema'
 
 export interface ICart extends Document {
     userId: Types.ObjectId
-    items: CartItem[]
+    items: ICartItem[]
     totalPrice: number
     totalQuantity: number
 }
@@ -12,7 +11,9 @@ export interface ICart extends Document {
 // Define Address Schema
 export const CartSchema: Schema<ICart> = new Schema<ICart>({
     userId: { type: Schema.Types.ObjectId, required: true },
-    images: { type: CartItemSchema, required: false },
+    items: { type: [CartItemSchema], required: false },
     totalPrice: { type: Number, required: true },
     totalQuantity: { type: Number, required: true },
 })
+
+export const CartModel = model<ICart>('Cart', CartSchema)

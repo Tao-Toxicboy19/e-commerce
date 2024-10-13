@@ -1,7 +1,7 @@
 // usecase/UploadImagesUsecase.ts
 import { v2 as cloudinary } from 'cloudinary'
 import { HttpError } from '../../../infrastructure/errors/HttpError'
-import { Images } from '../../entities/Images'
+import { ImagesEntities } from '../../entities/ImagesEntities'
 
 cloudinary.config({
     cloud_name: 'dvti5laoc',
@@ -10,10 +10,10 @@ cloudinary.config({
 })
 
 export class UploadImagesUsecase {
-    async execute(files: Express.Multer.File[]): Promise<Images[]> {
+    async execute(files: Express.Multer.File[]): Promise<ImagesEntities[]> {
         // ใช้ Promise ในการอัปโหลดแต่ละไฟล์ไปยัง Cloudinary
         const uploadPromises = files.map((file) => {
-            return new Promise<Images>((resolve, reject) => {
+            return new Promise<ImagesEntities>((resolve, reject) => {
                 const uploadStream = cloudinary.uploader.upload_stream(
                     (error, result) => {
                         if (error) {

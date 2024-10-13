@@ -1,11 +1,10 @@
 import { Schema, model, Document, Types } from 'mongoose'
-import { Address } from '../../domain/entities/Address'
-import { AddressSchema } from './AddressSchema'
+import { AddressSchema, IAddress } from './AddressSchema'
 
 export interface IShop extends Document {
     owner: string
     name: string
-    address: Address
+    address: IAddress
 }
 
 // Define Shop Schema

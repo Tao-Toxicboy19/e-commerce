@@ -1,12 +1,13 @@
-import { User, UserJwt } from '../../domain/entities/User'
 import { IUserRepository } from '../../domain/interfaces/IUserRepository'
 import bcrypt from 'bcrypt'
 import { UserModel } from '../schemas/UserSchema'
 import { ObjectId } from 'mongoose'
 import { HttpError } from '../errors/HttpError'
+import { JwtPayload } from '../../types/JwtPayload'
+import { UserEntities } from '../../domain/entities/UserEntities'
 
 export class UserRepository implements IUserRepository {
-    async login(email: string, password: string): Promise<UserJwt> {
+    async login(email: string, password: string): Promise<JwtPayload> {
         const user = await UserModel.findOne({ email })
             .select('password email _id role')
             .exec() // จำกัด fields เพื่อเพิ่มความเร็ว
@@ -22,7 +23,7 @@ export class UserRepository implements IUserRepository {
         throw new HttpError('Unauthorized', 401)
     }
 
-    async profile(sub: string): Promise<User> {
+    async profile(sub: string): Promise<UserEntities> {
         const user = await UserModel.findById({ _id: sub })
             .select('_id name email role address shop')
             .exec() // `.exec()` เพื่อให้ query มีประสิทธิภาพ
@@ -31,7 +32,7 @@ export class UserRepository implements IUserRepository {
         return user
     }
 
-    async signup(dto: User): Promise<void> {
+    async signup(dto: UserEntities): Promise<void> {
         const existingUser = await UserModel.findOne({
             $or: [{ name: dto.name }, { email: dto.email }],
         }).exec()
@@ -49,7 +50,7 @@ export class UserRepository implements IUserRepository {
         await newUser.save()
     }
 
-    async update(dto: User): Promise<void> {
+    async update(dto: UserEntities): Promise<void> {
         const updateUser = await UserModel.findByIdAndUpdate(
             { email: dto.email },
             {

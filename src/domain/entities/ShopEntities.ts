@@ -1,9 +1,9 @@
-import { Address } from './Address'
+import { AddressEntities } from './AddressEntities'
 
-export class Shop {
+export class ShopEntities {
     public owner: string
     public name: string
-    public address: Address
+    public address: AddressEntities
 
     constructor({
         owner,
@@ -12,7 +12,7 @@ export class Shop {
     }: {
         owner: string
         name: string
-        address: Address
+        address: AddressEntities
     }) {
         this.owner = owner
         this.name = name

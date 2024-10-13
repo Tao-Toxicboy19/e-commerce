@@ -1,5 +1,5 @@
 import { Types } from 'mongoose'
-import { Images } from './Images'
+import { ImagesEntities } from './ImagesEntities'
 
 export type ProductQuery = {
     query?: string
@@ -7,7 +7,7 @@ export type ProductQuery = {
     range?: { start: number; end: number }
 }
 
-export class Products {
+export class ProductsEntities {
     public id?: string
     public name: string
     public description: string
@@ -15,7 +15,7 @@ export class Products {
     public category: string
     public brand: string
     public stock: number
-    public images: Images[]
+    public images: ImagesEntities[]
     public shopOwner: Types.ObjectId
 
     constructor({
@@ -36,7 +36,7 @@ export class Products {
         category: string
         brand: string
         stock: number
-        images: Images[]
+        images: ImagesEntities[]
         shopOwner: Types.ObjectId
     }) {
         this.id = id

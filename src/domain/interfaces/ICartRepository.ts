@@ -1,9 +1,14 @@
-import { Cart } from '../entities/Cart'
-import { CartItem } from '../entities/CartItem'
+import { CartEntities } from '../entities/CartEntities'
+
+export interface CartActionParams {
+    id: string
+    userId: string
+    productId: string
+}
 
 export interface ICartRepository {
-    addToCart(dto: CartItem): Promise<void>
-    cart(userId: string): Promise<Cart>
-    increaseItem(id: string, userId: string): Promise<void>
-    reduceItem(id: string, userId: string): Promise<void>
+    cart(userId: string): Promise<CartEntities>
+    increaseItem(dto: CartActionParams): Promise<void>
+    reduceItem(dto: CartActionParams): Promise<void>
+    deleteProductOnCart(dto: CartActionParams): Promise<void>
 }

@@ -1,8 +1,9 @@
-import { User, UserJwt } from '../entities/User'
+import { JwtPayload } from '../../types/JwtPayload'
+import { UserEntities } from '../entities/UserEntities'
 
 export interface IUserRepository {
-    signup(dto: User): Promise<void>
-    login(email: string, password: string): Promise<UserJwt>
-    profile(sub: string): Promise<User>
-    update(dto: User): Promise<void>
+    signup(dto: UserEntities): Promise<void>
+    login(email: string, password: string): Promise<JwtPayload>
+    profile(sub: string): Promise<UserEntities>
+    update(dto: UserEntities): Promise<void>
 }

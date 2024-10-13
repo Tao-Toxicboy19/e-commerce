@@ -1,9 +1,9 @@
 import { Types } from 'mongoose'
 import { HttpError } from '../../../infrastructure/errors/HttpError'
-import { Products } from '../../entities/Products'
 import { IProductsRepository } from '../../interfaces/IProductsRepository'
 import { UploadImagesUsecase } from '../uploadImage/UploadImagesUsecase'
 import { ProductDto } from '../../../application/validate/products/ProductDto'
+import { ProductsEntities } from '../../entities/ProductsEntities'
 
 export class SaveProductUsecase {
     constructor(
@@ -31,7 +31,7 @@ export class SaveProductUsecase {
         }
         const uploadedImages = await this.uploadImagesUsecase.execute(files)
 
-        const productInstance = new Products({
+        const productInstance = new ProductsEntities({
             ...dto,
             images: uploadedImages,
             shopOwner: new Types.ObjectId(userId),
