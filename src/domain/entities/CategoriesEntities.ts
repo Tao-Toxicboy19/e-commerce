@@ -1,15 +1,15 @@
 export class CategoriesEntities {
     public name: string
-    public cout: number
+    public productCount: number
 
     constructor({
         name,
-        cout,
+        productCount,
     }: {
         name: string
-        cout: number
+        productCount: number
     }) {
         this.name = name
-        this.cout = cout
+        this.productCount = productCount
     }
 }

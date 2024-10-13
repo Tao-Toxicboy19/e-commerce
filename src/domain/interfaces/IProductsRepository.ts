@@ -4,6 +4,8 @@ export interface FindProduct {
     query?: string
     category?: string
     range?: { start: number; end: number }
+    page?: number
+    limit?: number
 }
 
 export interface IProductsRepository {
@@ -11,6 +13,8 @@ export interface IProductsRepository {
         query,
         category,
         range,
+        page,
+        limit
     }: FindProduct): Promise<ProductsEntities[]>
     saveProduct(dto: ProductsEntities): Promise<void>
     updateProduct(dto: ProductsEntities): Promise<void>

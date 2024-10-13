@@ -36,7 +36,6 @@ export class SaveProductUsecase {
             images: uploadedImages,
             shopOwner: new Types.ObjectId(userId),
         })
-        console.log(productInstance)
         return this.productsRepository.saveProduct(productInstance)
     }
 }

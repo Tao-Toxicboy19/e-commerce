@@ -12,6 +12,8 @@ export class ProductsUsecase {
         query,
         category,
         range,
+        page,
+        limit,
     }: FindProduct): Promise<ProductsEntities[]> {
         // ตรวจสอบว่า end ต้องมากกว่า 0 และ start ต้องไม่ติดลบ
         if (range && range.start < 0) {
@@ -24,6 +26,12 @@ export class ProductsUsecase {
         if (range && range.end <= 0) {
             throw new HttpError('end must be greater than 0.', 400)
         }
-        return this.productsRepository.products({ query, category, range })
+        return this.productsRepository.products({
+            query,
+            category,
+            range,
+            limit,
+            page,
+        })
     }
 }

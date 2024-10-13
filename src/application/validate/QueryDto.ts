@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod'
 
 export const queryDto = z.object({
     query: z.string().optional(),
@@ -11,4 +11,12 @@ export const queryDto = z.object({
         .string()
         .optional()
         .transform((val) => (val ? Number(val) : Infinity)), // end ต้องเป็น string ที่สามารถแปลงเป็น number หรือค่าเริ่มต้น Infinity
+    limit: z
+        .string()
+        .optional()
+        .transform((val) => (val ? Number(val) : 0)),
+    page: z
+        .string()
+        .optional()
+        .transform((val) => (val ? Number(val) : 0)),
 })

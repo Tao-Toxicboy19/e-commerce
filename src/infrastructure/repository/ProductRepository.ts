@@ -5,7 +5,7 @@ import {
     IProductsRepository,
 } from '../../domain/interfaces/IProductsRepository'
 import { HttpError } from '../errors/HttpError'
-import { CategoriesModel } from '../schemas/CategoriesSchema'
+import { CategoryModel } from '../schemas/CategoriesSchema'
 import { ProductModel } from '../schemas/ProductSchema'
 
 interface SearchConditions {
@@ -19,6 +19,8 @@ export class ProductRepository implements IProductsRepository {
         query,
         category,
         range,
+        limit = 10,
+        page = 1,
     }: FindProduct): Promise<ProductsEntities[]> {
         try {
             let searchConditions: SearchConditions = {}
@@ -32,9 +34,13 @@ export class ProductRepository implements IProductsRepository {
                 }
             }
 
+            const skip = (page - 1) * limit
+
             return await ProductModel.find(searchConditions)
                 .select('-reviews -__v')
                 .populate('shopOwner', 'shop')
+                .skip(skip)
+                .limit(limit)
                 .lean()
                 .exec()
         } catch (error) {
@@ -47,29 +53,16 @@ export class ProductRepository implements IProductsRepository {
             // บันทึก product ใหม่
             const product = await new ProductModel(dto).save()
 
-            // ตรวจสอบว่า category ที่ต้องการมีอยู่ใน DB หรือไม่
-            let category = await CategoriesModel.findOne({
-                name: dto.category,
-            })
-                .select('name')
-                .exec()
-
-            if (!category) {
-                // ถ้า category ไม่มี ให้สร้าง category ใหม่
-                category = new CategoriesModel({
-                    name: dto.category,
-                    cout: [product._id as Types.ObjectId], // แปลง _id ให้เป็น Types.ObjectId
-                })
-            } else {
-                // ถ้ามี category แล้ว ให้เพิ่ม productId เข้าไปใน cout array
-                if (!category.cout.includes(product._id as Types.ObjectId)) {
-                    category.cout.push(product._id as Types.ObjectId)
-                }
-            }
-
-            // บันทึกการเปลี่ยนแปลงใน category
-            await category.save()
+            // ค้นหา category โดยใช้ findOneAndUpdate
+            await CategoryModel.findOneAndUpdate(
+                { name: dto.category }, // ค้นหา category ตามชื่อ
+                {
+                    $addToSet: { products: { productId: product._id } }, // เพิ่ม productId เข้าไปใน products (ป้องกันการเพิ่มซ้ำด้วย $addToSet)
+                },
+                { upsert: true, new: true } // ถ้าไม่มี category นี้ ให้สร้างใหม่ (upsert: true)
+            )
         } catch (error) {
+            console.log(error)
             throw new HttpError('Could not save product', 400)
         }
     }

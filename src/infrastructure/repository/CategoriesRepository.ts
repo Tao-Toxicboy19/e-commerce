@@ -1,16 +1,18 @@
 import { CategoriesEntities } from '../../domain/entities/CategoriesEntities'
 import { ICategoriesRepository } from '../../domain/interfaces/ICategoriesRepository'
 import { HttpError } from '../errors/HttpError'
-import { CategoriesModel } from '../schemas/CategoriesSchema'
+import { CategoryModel } from '../schemas/CategoriesSchema'
 
 export class CategoriesRepository implements ICategoriesRepository {
     async findAllCategorise(): Promise<CategoriesEntities[]> {
         try {
-            return await CategoriesModel.aggregate([
+            const cate = await CategoryModel.findById({_id:'670b70dccc3c7632186a32be'}).exec()
+            console.log(cate)
+            return await CategoryModel.aggregate([
                 {
                     $project: {
                         name: 1, // แสดงฟิลด์ name
-                        cout: { $size: '$cout' }, // นับจำนวน productId ใน array cout
+                        cout: { $size: '$products' }, // นับจำนวน productId ใน array productCout
                     },
                 },
             ]).exec()

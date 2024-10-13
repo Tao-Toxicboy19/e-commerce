@@ -1,16 +1,36 @@
-import { model, Schema, Types, Document } from 'mongoose'
+import { model, Schema, Types } from 'mongoose'
 
-export interface ICategories extends Document {
-    name: string
-    cout: Types.ObjectId[] // เก็บ productId เป็น array ของ ObjectId
+interface IProducts {
+    productId: Types.ObjectId
 }
 
-export const CategoriesSchema: Schema<ICategories> = new Schema<ICategories>({
-    name: { type: String, required: true },
-    cout: [{ type: Types.ObjectId, ref: 'Product', required: true }], // กำหนดเป็น array ที่อ้างอิง productId
-})
+interface ICatogory {
+    name: string
+    products: IProducts[]
+}
 
-export const CategoriesModel = model<ICategories>(
-    'Categories',
-    CategoriesSchema
+// สร้าง schema สำหรับ Categories
+const categorySchema: Schema<ICatogory> = new Schema<ICatogory>(
+    {
+        name: {
+            type: String,
+            required: true, // ชื่อหมวดหมู่ต้องมีค่าเสมอ
+            trim: true,
+        },
+        products: [
+            {
+                productId: {
+                    type: Types.ObjectId, // อ้างอิงถึง ObjectId ของสินค้า
+                    ref: 'Product', // เชื่อมต่อกับ collection ของสินค้า
+                    required: true, // ต้องมีค่าเสมอ
+                },
+            },
+        ],
+    },
+    {
+        timestamps: true, // เพิ่ม createdAt และ updatedAt อัตโนมัติ
+    }
 )
+
+// สร้าง model สำหรับ Categories
+export const CategoryModel = model<ICatogory>('Category', categorySchema)
