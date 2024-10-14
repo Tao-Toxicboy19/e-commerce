@@ -4,9 +4,9 @@ import { HttpError } from '../../../infrastructure/errors/HttpError'
 import { ImagesEntities } from '../../entities/ImagesEntities'
 
 cloudinary.config({
-    cloud_name: 'dvti5laoc',
-    api_key: '616852622584911',
-    api_secret: '_WxqsLcsI_YSPWMN9Nh5s8NvlEA', // Click 'View API Keys' above to copy your API secret
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET,
 })
 
 export class UploadImagesUsecase {
