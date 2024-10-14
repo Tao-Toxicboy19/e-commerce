@@ -38,6 +38,7 @@ app.use(
         },
     })
 )
+
 app.use(express.json())
 app.use('/api', userRoutes)
 app.use('/api', addressRoute)
