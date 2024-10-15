@@ -2,9 +2,9 @@ import mongoose from 'mongoose'
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(
-            'mongodb://root:example@localhost:27017/app?authSource=admin'
-        )
+        const uri = process.env.MONGODB_URI
+        if (!uri) throw new Error()
+        await mongoose.connect(uri)
         console.log('MongoDB connected')
     } catch (error) {
         console.error('Error connecting to MongoDB:', error)
