@@ -20,7 +20,7 @@ connectDB()
 
 const redisClient = new Redis({
     host: process.env.REDIS_HOST, // ตั้งค่า host ของ Redis
-    port: Number(process.env.REDIST_PORT), // ตั้งค่า port ของ Redis
+    port: Number(process.env.REDIS_PORT), // ตั้งค่า port ของ Redis
 })
 
 // การตั้งค่า session middleware

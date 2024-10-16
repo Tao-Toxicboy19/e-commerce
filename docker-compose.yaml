@@ -14,7 +14,7 @@ services:
       - "6379:6379"
 
   web-server:
-    image: taotoxicboy:node-e-commerce
+    image: taotoxicboy/node-e-commerce:latest
     restart: always
     environment:
       RT_SECRET: JiZrdW9x2eYdPw3WXsmpbeL9ufCAcjig
