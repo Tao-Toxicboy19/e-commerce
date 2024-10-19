@@ -10,6 +10,7 @@ import productRoute from './application/routes/ProductRoute'
 import shopRoute from './application/routes/ShopRoute'
 import cartRoute from './application/routes/CartRoute'
 import categoriesRoute from './application/routes/CategoriesRoute'
+import cors from 'cors'
 
 dotenv.config()
 
@@ -23,6 +24,7 @@ const redisClient = new Redis({
     port: Number(process.env.REDIS_PORT), // ตั้งค่า port ของ Redis
 })
 
+app.use(cors())
 // การตั้งค่า session middleware
 app.use(
     session({
