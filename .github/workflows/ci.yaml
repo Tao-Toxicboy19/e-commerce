@@ -45,6 +45,6 @@ jobs:
           port: 22
           script: |
             cd /root/web-server.iaaaiksu
-            docker-compose down
+            docker compose down
             docker rmi ${{ secrets.DOCKER_USERNAME }}/node-e-commerce:latest
-            docker-compose up -d
+            docker compose up -d
