@@ -14,7 +14,7 @@ export class ProductsUsecase {
         range,
         page,
         limit,
-    }: FindProduct): Promise<ProductsEntities[]> {
+    }: FindProduct): Promise<{ count: number; products: ProductsEntities[] }> {
         // ตรวจสอบว่า end ต้องมากกว่า 0 และ start ต้องไม่ติดลบ
         if (range && range.start < 0) {
             throw new HttpError(

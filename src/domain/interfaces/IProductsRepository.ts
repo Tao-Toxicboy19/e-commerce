@@ -15,7 +15,7 @@ export interface IProductsRepository {
         range,
         page,
         limit,
-    }: FindProduct): Promise<ProductsEntities[]>
+    }: FindProduct): Promise<{ count: number; products: ProductsEntities[] }>
     saveProduct(dto: ProductsEntities): Promise<void>
     updateProduct(dto: ProductsEntities): Promise<void>
     deleteProduct(id: string): Promise<void>

@@ -21,7 +21,7 @@ export class ProductRepository implements IProductsRepository {
         range,
         limit = 10,
         page = 1,
-    }: FindProduct): Promise<ProductsEntities[]> {
+    }: FindProduct): Promise<{ count: number; products: ProductsEntities[] }> {
         try {
             let searchConditions: SearchConditions = {}
             if (query) searchConditions.name = { $regex: query, $options: 'i' }
@@ -36,13 +36,19 @@ export class ProductRepository implements IProductsRepository {
 
             const skip = (page - 1) * limit
 
-            return await ProductModel.find(searchConditions)
+            const totalProducts = await ProductModel.countDocuments(
+                searchConditions
+            )
+
+            const products = await ProductModel.find(searchConditions)
                 .select('-reviews -__v')
                 .populate('shopOwner', 'shop')
                 .skip(skip)
                 .limit(limit)
                 .lean()
                 .exec()
+
+            return { count: totalProducts, products }
         } catch (error) {
             throw new HttpError('Could not retrieve products', 400)
         }
@@ -101,7 +107,7 @@ export class ProductRepository implements IProductsRepository {
     async searchProduct(productName: string): Promise<string[]> {
         try {
             return await ProductModel.distinct('name', {
-                name: { $regex: productName, $options: 'i' }, 
+                name: { $regex: productName, $options: 'i' },
             }).exec()
         } catch (error) {
             console.log(error)
