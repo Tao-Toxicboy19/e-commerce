@@ -98,13 +98,11 @@ export class ProductRepository implements IProductsRepository {
         }
     }
 
-    async searchProduct(productName: string): Promise<{ name: string }[]> {
+    async searchProduct(productName: string): Promise<string[]> {
         try {
-            return await ProductModel.find({
-                name: { $regex: productName, $options: 'i' },
-            })
-                .select('name')
-                .exec()
+            return await ProductModel.distinct('name', {
+                name: { $regex: productName, $options: 'i' }, 
+            }).exec()
         } catch (error) {
             console.log(error)
             throw new HttpError('Could not search product', 400)
