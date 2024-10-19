@@ -24,10 +24,10 @@ export class ProductController {
         try {
             const query = queryDto.parse(req.query)
             if (query.search) {
-                const pro = await this.searchProductUsecase.execute(
+                const products = await this.searchProductUsecase.execute(
                     query.search
                 )
-                res.json(pro)
+                res.json(products)
             } else {
                 const products = await this.prodcutsUsecase.execute({
                     ...query,
