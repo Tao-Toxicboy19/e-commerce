@@ -24,7 +24,12 @@ const redisClient = new Redis({
     port: Number(process.env.REDIS_PORT), // ตั้งค่า port ของ Redis
 })
 
-app.use(cors())
+app.use(
+    cors({
+        origin: true,
+        credentials: true, 
+    })
+)
 // การตั้งค่า session middleware
 app.use(
     session({
