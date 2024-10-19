@@ -97,4 +97,17 @@ export class ProductRepository implements IProductsRepository {
             throw new HttpError('Could not delete product', 400)
         }
     }
+
+    async searchProduct(productName: string): Promise<{ name: string }[]> {
+        try {
+            return await ProductModel.find({
+                name: { $regex: productName, $options: 'i' },
+            })
+                .select('name')
+                .exec()
+        } catch (error) {
+            console.log(error)
+            throw new HttpError('Could not search product', 400)
+        }
+    }
 }

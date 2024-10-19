@@ -3,6 +3,7 @@ import { z } from 'zod'
 export const queryDto = z.object({
     query: z.string().optional(),
     category: z.string().optional(),
+    search: z.string().optional(),
     start: z
         .string()
         .optional()

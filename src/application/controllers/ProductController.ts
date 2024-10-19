@@ -9,23 +9,32 @@ import { productDto } from '../validate/products/ProductDto'
 import { updateProductDto } from '../validate/products/UpdateProductDto'
 import { DeleteProductUsecase } from '../../domain/usecase/product/DeleteProductUsecase'
 import { deleteProductDto } from '../validate/products/DeleteProductDto'
+import { SearchProductUsecase } from '../../domain/usecase/product/SearchProductUsecase'
 
 export class ProductController {
     constructor(
         private prodcutsUsecase: ProductsUsecase,
         private saveProductUsecase: SaveProductUsecase,
         private updateProductUsecase: UpdateProductUsecase,
-        private deleteProductUsecase: DeleteProductUsecase
+        private deleteProductUsecase: DeleteProductUsecase,
+        private searchProductUsecase: SearchProductUsecase
     ) {}
 
     async productHandler(req: Request, res: Response) {
         try {
             const query = queryDto.parse(req.query)
-            const products = await this.prodcutsUsecase.execute({
-                ...query,
-                range: { start: query.start, end: query.end },
-            })
-            res.json(products)
+            if (query.search) {
+                const pro = await this.searchProductUsecase.execute(
+                    query.search
+                )
+                res.json(pro)
+            } else {
+                const products = await this.prodcutsUsecase.execute({
+                    ...query,
+                    range: { start: query.start, end: query.end },
+                })
+                res.json(products)
+            }
         } catch (err) {
             ErrorHandler.handleError(err, res)
         }

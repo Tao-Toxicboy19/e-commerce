@@ -13,17 +13,20 @@ services:
     ports:
       - "6379:6379"
 
-  web-server:
-    image: taotoxicboy/node-e-commerce:latest
-    restart: always
-    environment:
-      RT_SECRET: JiZrdW9x2eYdPw3WXsmpbeL9ufCAcjig
-      AT_SECRET: VgmBOirkrV6x179MeyStIN8jr2xWQVWx
-      CLOUD_NAME: dvti5laoc
-      API_KEY: 616852622584911
-      API_SECRET: _WxqsLcsI_YSPWMN9Nh5s8NvlEA
-      REDIST_HOST: 127.0.0.1
-      REDIST_PORT: 6379
-      MONGODB_URI: mongodb://root:example@mongo:27017/app?authSource=admin
-    ports:
-      - 3030:3000
+  # web-server:
+  #   image: taotoxicboy/node-e-commerce:latest
+  #   restart: always
+  #   environment:
+  #     RT_SECRET: JiZrdW9x2eYdPw3WXsmpbeL9ufCAcjig
+  #     AT_SECRET: VgmBOirkrV6x179MeyStIN8jr2xWQVWx
+  #     CLOUD_NAME: dvti5laoc
+  #     API_KEY: 616852622584911
+  #     API_SECRET: _WxqsLcsI_YSPWMN9Nh5s8NvlEA
+  #     REDIS_HOST: 127.0.0.1
+  #     REDIS_PORT: 6379
+  #     MONGODB_URI: mongodb://root:example@mongo:27017/app?authSource=admin
+  #   ports:
+  #     - 3030:3000
+  #   depends_on:
+  #     - redis
+  #     - mongo

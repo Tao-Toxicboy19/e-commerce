@@ -8,6 +8,7 @@ import { UploadImageGuard } from '../middleware/UploadImageGuard'
 import { UploadImagesUsecase } from '../../domain/usecase/uploadImage/UploadImagesUsecase'
 import { UpdateProductUsecase } from '../../domain/usecase/product/UpdateProductUsecase'
 import { DeleteProductUsecase } from '../../domain/usecase/product/DeleteProductUsecase'
+import { SearchProductUsecase } from '../../domain/usecase/product/SearchProductUsecase'
 
 const router = Router()
 
@@ -24,17 +25,20 @@ const updateProductUsecase = new UpdateProductUsecase(
     productsRepository,
     uploadImageUsecase
 )
+const searchProductUsecase = new SearchProductUsecase(productsRepository)
 const deleteProductUsecase = new DeleteProductUsecase(productsRepository)
 const productsController = new ProductController(
     productsUsecase,
     saveProductUsecase,
     updateProductUsecase,
-    deleteProductUsecase
+    deleteProductUsecase,
+    searchProductUsecase
 )
 
 router.get('/products', (req, res) =>
     productsController.productHandler(req, res)
 )
+
 router.post(
     '/product',
     UseGuard.jwtAuthGuard,

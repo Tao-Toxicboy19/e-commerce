@@ -39,7 +39,6 @@ export class UseGuard {
         next: NextFunction
     ): void {
         if (req.user && (req.user as JwtPayload).role === 'shop') {
-            console.log(req.user)
             next() // ถ้า role เป็น 'shop' ให้ผ่านไป middleware ต่อไปได้
             return // เพิ่ม return เพื่อหยุดการทำงานหลังจาก next()
         }

@@ -14,9 +14,10 @@ export interface IProductsRepository {
         category,
         range,
         page,
-        limit
+        limit,
     }: FindProduct): Promise<ProductsEntities[]>
     saveProduct(dto: ProductsEntities): Promise<void>
     updateProduct(dto: ProductsEntities): Promise<void>
     deleteProduct(id: string): Promise<void>
+    searchProduct(productName: string): Promise<{ name: string }[]>
 }
