@@ -12,7 +12,7 @@ export class CategoriesRepository implements ICategoriesRepository {
                 {
                     $project: {
                         name: 1, // แสดงฟิลด์ name
-                        cout: { $size: '$products' }, // นับจำนวน productId ใน array productCout
+                        count: { $size: '$products' }, // นับจำนวน productId ใน array productCout
                     },
                 },
             ]).exec()
