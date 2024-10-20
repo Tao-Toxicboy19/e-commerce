@@ -2,7 +2,7 @@ import { ProductsEntities } from '../entities/ProductsEntities'
 
 export interface FindProduct {
     query?: string
-    category?: string
+    category?: string[] | string
     range?: { start: number; end: number }
     page?: number
     limit?: number

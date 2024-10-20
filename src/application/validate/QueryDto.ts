@@ -2,7 +2,9 @@ import { z } from 'zod'
 
 export const queryDto = z.object({
     query: z.string().optional(),
-    category: z.string().optional(),
+    category: z
+        .union([z.string(), z.array(z.string())]) // อนุญาตทั้ง string และ array ของ string
+        .optional(),
     search: z.string().optional(),
     start: z
         .string()

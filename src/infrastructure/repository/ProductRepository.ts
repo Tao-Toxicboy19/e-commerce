@@ -10,7 +10,7 @@ import { ProductModel } from '../schemas/ProductSchema'
 
 interface SearchConditions {
     name?: { $regex: string; $options: string }
-    category?: { $regex: string; $options: string }
+    category?: { $regex: string; $options: string } | { $in: string[] } | any
     price?: { $gte: number; $lte: number }
 }
 
@@ -24,22 +24,38 @@ export class ProductRepository implements IProductsRepository {
     }: FindProduct): Promise<{ count: number; products: ProductsEntities[] }> {
         try {
             let searchConditions: SearchConditions = {}
-            if (query) searchConditions.name = { $regex: query, $options: 'i' }
-            if (category)
-                searchConditions.category = { $regex: category, $options: 'i' }
+            const skip = (page - 1) * limit
+
+            // ถ้ามี query ค้นหาตามชื่อผลิตภัณฑ์
+            if (query) {
+                searchConditions.name = { $regex: query, $options: 'i' }
+            }
+
+            // จัดการกับช่วงราคา
             if (range && range.start >= 0 && range.end > 0) {
                 searchConditions.price = {
                     $gte: range.start,
                     $lte: range.end,
                 }
             }
-
-            const skip = (page - 1) * limit
-
+            // ค้นหาตาม category (จัดการกรณี string และ array)
+            if (category) {
+                if (Array.isArray(category)) {
+                    // ถ้า category เป็น array ให้ใช้ $in เพื่อค้นหาหลายค่า
+                    searchConditions.category = { $in: category }
+                } else {
+                    // ถ้า category เป็น string ให้ใช้ $regex
+                    searchConditions.category = {
+                        $regex: category,
+                        $options: 'i',
+                    }
+                }
+            }
+            // นับจำนวนสินค้าทั้งหมดที่ตรงกับเงื่อนไข
             const totalProducts = await ProductModel.countDocuments(
                 searchConditions
             )
-
+            // ดึงสินค้าจริง ๆ ที่ตรงกับเงื่อนไข
             const products = await ProductModel.find(searchConditions)
                 .select('-reviews -__v')
                 .populate('shopOwner', 'shop')
