@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "npx nodemon src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx jest",
     "build": "npx tsc"
   },
   "dependencies": {
